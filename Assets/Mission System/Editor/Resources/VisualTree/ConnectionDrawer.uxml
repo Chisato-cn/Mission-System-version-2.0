@@ -1,0 +1,17 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Mission%20System/Editor/Resources/StyleSheet/ConnectionDrawer.uss?fileID=7433441132597879392&amp;guid=05146053188ab4f4089ff1a9aaac8ee0&amp;type=3#ConnectionDrawer"/>
+    <ui:Foldout text="Foldout" name="Container">
+        <ui:VisualElement name="IsValid" style="flex-grow: 1; flex-direction: row;">
+            <ui:Label text="Label"/>
+            <uie:PropertyField/>
+        </ui:VisualElement>
+        <ui:VisualElement name="IsParallelConnection" style="flex-grow: 1; flex-direction: row;">
+            <ui:Label text="Label"/>
+            <uie:PropertyField/>
+        </ui:VisualElement>
+        <ui:VisualElement name="HasCondition" style="flex-grow: 1; flex-direction: row;">
+            <ui:Label text="Label"/>
+            <uie:PropertyField/>
+        </ui:VisualElement>
+    </ui:Foldout>
+</ui:UXML>

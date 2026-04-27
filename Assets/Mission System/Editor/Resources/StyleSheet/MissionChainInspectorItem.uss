@@ -1,0 +1,17 @@
+#PropertyContainer {
+    flex-direction: row;
+    padding: 5px;
+    margin-bottom: 5px;
+    background-color: rgba(71, 71, 71, 0.8);
+    justify-content: space-between;
+}
+
+#PropertyContainer #PropertyName {
+    -unity-text-align: middle-center;
+    margin: 0;
+    padding: 0;
+}
+
+#PropertyContainer PropertyField {
+    width: 70%;
+}

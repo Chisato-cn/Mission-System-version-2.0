@@ -1,0 +1,25 @@
+Toolbar {
+    background-color: rgb(37, 37, 37);
+    height: 25px;
+}
+
+.unity-toolbar > .unity-label {
+    margin-top: 0;
+    margin-right: 5px;
+    margin-bottom: 0;
+    margin-left: 5px;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    -unity-text-align: middle-left;
+    white-space: nowrap;
+    text-overflow: clip;
+    color: rgb(210, 210, 210);
+    -unity-font-style: bold;
+    font-size: 16px;
+}
+
+#ScrollView {
+    margin-top: 5px;
+}

@@ -1,0 +1,31 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Mission%20System/Editor/Resources/StyleSheet/MissionChainEditor.uss?fileID=7433441132597879392&amp;guid=e58cf2a05c4e1eb49b697477873d7f1f&amp;type=3#MissionChainEditor"/>
+    <Tomoe.MissionSystem.Editor.SplitView>
+        <ui:VisualElement name="LeftPanel" style="flex-grow: 1;">
+            <Tomoe.MissionSystem.Editor.SplitView orientation="Vertical">
+                <ui:VisualElement name="TopPanel" style="flex-grow: 1;">
+                    <uie:Toolbar>
+                        <ui:Label text="Inspector"/>
+                    </uie:Toolbar>
+                    <ui:ScrollView name="ScrollView">
+                        <ui:VisualElement name="InspectorContainer" style="flex-grow: 1;"/>
+                    </ui:ScrollView>
+                </ui:VisualElement>
+                <ui:VisualElement name="BottomPanel" style="flex-grow: 1;">
+                    <uie:Toolbar>
+                        <ui:Label text="Project"/>
+                    </uie:Toolbar>
+                    <ui:ScrollView>
+                        <ui:VisualElement name="ProjectContainer" style="flex-grow: 1;"/>
+                    </ui:ScrollView>
+                </ui:VisualElement>
+            </Tomoe.MissionSystem.Editor.SplitView>
+        </ui:VisualElement>
+        <ui:VisualElement name="RightPanel" style="flex-grow: 1;">
+            <uie:Toolbar>
+                <ui:Label text="Graph View"/>
+            </uie:Toolbar>
+            <ui:VisualElement name="GraphViewContainer" style="flex-grow: 1;"/>
+        </ui:VisualElement>
+    </Tomoe.MissionSystem.Editor.SplitView>
+</ui:UXML>

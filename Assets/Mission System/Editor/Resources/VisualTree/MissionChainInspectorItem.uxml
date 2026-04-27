@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Mission%20System/Editor/Resources/StyleSheet/MissionChainInspectorItem.uss?fileID=7433441132597879392&amp;guid=32acce51404d95141ac6adb808da8579&amp;type=3#MissionChainInspectorItem"/>
+    <ui:VisualElement name="PropertyContainer" style="flex-grow: 1;">
+        <ui:Label text="Label" name="PropertyName"/>
+        <uie:PropertyField/>
+    </ui:VisualElement>
+</ui:UXML>
