@@ -13,7 +13,7 @@ namespace Tomoe.MissionSystem.Editor
         
         public PropertyField PropField => propField;
 
-        public MissionChainInspectorItem(SerializedProperty serializedProperty)
+        public MissionChainInspectorItem(SerializedProperty serializedProperty, bool enable)
         {
             VisualTreeAsset visualTree = Resources.Load<VisualTreeAsset>("VisualTree/MissionChainInspectorItem");
             visualTree.CloneTree(this);
@@ -25,6 +25,7 @@ namespace Tomoe.MissionSystem.Editor
             propField.label = String.Empty;
             propField.Bind(serializedProperty.serializedObject);
             propField.bindingPath = serializedProperty.propertyPath;
+            propField.SetEnabled(enable);
         }
     }
 }

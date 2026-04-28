@@ -4,14 +4,25 @@
     margin-bottom: 5px;
     background-color: rgba(71, 71, 71, 0.8);
     justify-content: space-between;
+    flex-shrink: 0;
 }
 
 #PropertyContainer #PropertyName {
     -unity-text-align: middle-center;
     margin: 0;
     padding: 0;
+    flex-shrink: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
-#PropertyContainer PropertyField {
-    width: 70%;
+.seventy-percent-width-property-field {
+    width: 90%;
+    flex-shrink: 1;
+}
+
+.auto-width-property-field {
+    width: auto;
+    flex-shrink: 0;
 }

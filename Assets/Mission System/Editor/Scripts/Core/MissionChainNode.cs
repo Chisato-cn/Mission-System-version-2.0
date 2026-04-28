@@ -104,6 +104,12 @@ namespace Tomoe.MissionSystem.Editor
             OnNodeViewSelected?.Invoke(null);
         }
 
+        public override void SetPosition(Rect newPos)
+        {
+            base.SetPosition(newPos);
+            node.Position = newPos.position;
+        }
+
         public override Port InstantiatePort(Orientation orientation, Direction direction, Port.Capacity capacity, Type type) 
             => Port.Create<ConnectionView>(orientation, direction, capacity, type);
     }

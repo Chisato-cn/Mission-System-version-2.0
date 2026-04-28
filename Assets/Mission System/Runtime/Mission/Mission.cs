@@ -16,10 +16,10 @@ namespace Tomoe.MissionSystem.Runtime
     public class Mission
     {
         [SerializeField] private string missionId;
-        [SerializeField] private string missionName;
-        [SerializeField] private string missionDescription;
+        [SerializeField, TextArea(1, 10)] private string missionName;
+        [SerializeField, TextArea(5, 10)] private string missionDescription;
         [SerializeField] private MissionRequirementMode missionRequirementMode;
-        [SerializeField] private int customRequirementCompleteCount;
+        [SerializeField] private int customRequirementCompleteCount = -1;
         [SerializeReference] private MissionRequirement[] missionRequirements;
         [SerializeReference] private MissionReward[] missionRewards;
         

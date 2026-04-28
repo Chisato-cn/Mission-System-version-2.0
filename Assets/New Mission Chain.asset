@@ -13,53 +13,13 @@ MonoBehaviour:
   m_Name: New Mission Chain
   m_EditorClassIdentifier: Assembly-CSharp::Tomoe.MissionSystem.Runtime.MissionChain
   guid: f8d774d8-ba8a-47b4-b79a-b3d994cc5d86
-  nodes:
-  - rid: 2229735403969839289
-  - rid: 2229735403969839290
+  connections: []
+  nodes: []
+  missionChainType: 0
+  missionChainName: 
+  missionChainDescription: 
+  GraphPosition: {x: 0, y: 0, z: 0}
+  GraphScale: {x: 1, y: 1, z: 1}
   references:
     version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
-    - rid: 2229735403969839289
-      type: {class: MCMissionNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
-      data:
-        guid: 3d2b2b0d-dc98-4d6a-9819-101965623443
-        type: 3
-        outputConnections:
-        - inputMCNode:
-            rid: 2229735403969839290
-          outputMCNode:
-            rid: 2229735403969839289
-          isValid: 0
-          isParallelConnection: 0
-          hasCondition: 0
-          condition:
-            rid: -2
-        Position: {x: 0, y: 0}
-        InputConnections: []
-        mission:
-          missionId: f8d774d8-ba8a-47b4-b79a-b3d994cc5d86|3d2b2b0d-dc98-4d6a-9819-101965623443
-          missionName: 
-          missionDescription: 
-          missionRequirementMode: 0
-          customRequirementCompleteCount: 0
-          missionRequirements: []
-          missionRewards: []
-    - rid: 2229735403969839290
-      type: {class: MCEndNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
-      data:
-        guid: f6fd2e72-d208-48e8-a1db-e2ef71758a3c
-        type: 1
-        outputConnections: []
-        Position: {x: 0, y: 0}
-        InputConnections:
-        - inputMCNode:
-            rid: 2229735403969839290
-          outputMCNode:
-            rid: 2229735403969839289
-          isValid: 0
-          isParallelConnection: 0
-          hasCondition: 0
-          condition:
-            rid: -2
+    RefIds: []

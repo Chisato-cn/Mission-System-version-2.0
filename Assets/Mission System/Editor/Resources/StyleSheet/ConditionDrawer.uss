@@ -1,17 +1,17 @@
-.unity-label {
-    -unity-text-align: middle-center;
-    margin: 0;
-    padding: 0;
-    flex-shrink: 0;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-}
+/*.unity-label {*/
+/*    -unity-text-align: middle-center;*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*    flex-shrink: 0;*/
+/*    text-overflow: ellipsis;*/
+/*    white-space: nowrap;*/
+/*    overflow: hidden;*/
+/*}*/
 
-.unity-property-field {
-    width: 90%;
-    flex-shrink: 1;
-}
+/*.unity-property-field {*/
+/*    width: 90%;*/
+/*    flex-shrink: 1;*/
+/*}*/
 
 .container {
     flex-direction: row;

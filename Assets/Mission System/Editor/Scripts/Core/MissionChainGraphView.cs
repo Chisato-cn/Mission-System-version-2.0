@@ -13,17 +13,15 @@ namespace Tomoe.MissionSystem.Editor
 {
     public class MissionChainGraphView : GraphView
     {
-        private MissionChain currentChain;
-        
         private MissionChainSearchTree searchTree;
         
+        private MissionChainEditor editor;
         public Edge TempEdge { get; set; }
+        private MissionChain currentChain => editor.MissionChain;
         
-        public event Func<Vector2, Vector2> OnChangeCoordinatesToGraphView;
-        public event Action<GraphElement> OnGraphElementSelected; 
         public event Action OnWindowFocusChanged; 
         
-        public MissionChainGraphView()
+        public MissionChainGraphView(MissionChainEditor editor)
         {
             Insert(0, new GridBackground());
             styleSheets.Add(Resources.Load<StyleSheet>("StyleSheet/MissionChainGraphView"));
@@ -33,7 +31,8 @@ namespace Tomoe.MissionSystem.Editor
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
-            
+
+            this.editor = editor;
             graphViewChanged += GraphViewChanged;
             searchTree = ScriptableObject.CreateInstance<MissionChainSearchTree>();
             searchTree.OnEntrySelected += SearchTreeOnEntrySelected;
@@ -41,9 +40,8 @@ namespace Tomoe.MissionSystem.Editor
                 SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), searchTree);
         }
 
-        public void PopulateGraph(MissionChain currentChain)
+        public void PopulateGraph()
         {
-            this.currentChain = currentChain;
         }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -71,16 +69,16 @@ namespace Tomoe.MissionSystem.Editor
 
                     var connection = new Connection()
                     {
-                        InputMCNode = inputNodeView.Node,
-                        OutputMCNode = outputNodeView.Node
+                        InputMCNode = inputNodeView.Node.Guid,
+                        OutputMCNode = outputNodeView.Node.Guid
                     };
                     
                     var connectionView = (ConnectionView)edge;
                     connectionView.Data = connection;
-                    connectionView.OnEdgeSelected += element => OnGraphElementSelected?.Invoke(element);
+                    connectionView.OnEdgeSelected += element => editor.PopulateInspector(element);
                     
-                    outputNodeView.Node.OutputConnections.Add(connection);
-                    inputNodeView.Node.InputConnections.Add(connection);
+                    outputNodeView.Node.OutputConnections.Add(connection.Guid);
+                    inputNodeView.Node.InputConnections.Add(connection.Guid);
                 }
             }
 
@@ -108,20 +106,29 @@ namespace Tomoe.MissionSystem.Editor
                 // 删除节点
                 foreach (MissionChainNode node in nodeToDelete)
                 {
-                    foreach (Connection connection in node.Node.OutputConnections.ToList())
+                    HashSet<string> connectionToDelete = new HashSet<string>();
+                    foreach (string connectionGuid in node.Node.OutputConnections)
                     {
-                        var inputNode = connection.InputMCNode;
-                        inputNode.InputConnections.RemoveAll(conn => conn.OutputMCNode == node.Node);
+                        // 记录需要移除的connection的id
+                        connectionToDelete.Add(connectionGuid);
+                        
+                        // 输入节点断开连接
+                        var inputMCNodeGuid = currentChain.ReadOnlyConnections[connectionGuid].InputMCNode;
+                        var inputNode = currentChain.ReadOnlyNodes[inputMCNodeGuid];
+                        inputNode.InputConnections.RemoveAll(conn => conn == connectionGuid);
                     }
-                    foreach (Connection connection in node.Node.InputConnections.ToList())
+                    foreach (string connectionGuid in node.Node.InputConnections)
                     {
-                        var outputNode = connection.OutputMCNode;
-                        outputNode.OutputConnections.RemoveAll(conn => conn.InputMCNode == node.Node);
+                        // 记录需要移除的connection的id
+                        connectionToDelete.Add(connectionGuid);
+                        
+                        var outputMCNodeGuid = currentChain.ReadOnlyConnections[connectionGuid].OutputMCNode;
+                        var outputNode = currentChain.ReadOnlyNodes[outputMCNodeGuid];
+                        outputNode.OutputConnections.RemoveAll(conn => conn == connectionGuid);
                     }
                 
                     node.Node.OutputConnections.Clear();
                     node.Node.InputConnections.Clear();
-                
                     currentChain.Nodes.Remove(node.Node);
                 }
                 // 删除边
@@ -130,8 +137,10 @@ namespace Tomoe.MissionSystem.Editor
                     var inputNode = ((MissionChainNode)edge.input.node).Node;
                     var outputNode = ((MissionChainNode)edge.output.node).Node;
 
-                    inputNode.InputConnections.Remove(((ConnectionView)edge).Data);
-                    outputNode.OutputConnections.Remove(((ConnectionView)edge).Data);
+                    var edgeGuid = ((ConnectionView)edge).Data.Guid;
+                    inputNode.InputConnections.Remove(edgeGuid);
+                    outputNode.OutputConnections.Remove(edgeGuid);
+                    currentChain.Connections.RemoveAll(connection => connection.Guid == edgeGuid);
                 }
             }
             
@@ -151,7 +160,7 @@ namespace Tomoe.MissionSystem.Editor
 
         private void SearchTreeOnEntrySelected(Type nodeType, Vector2 mouseScreenPosition)
         {
-            var position = OnChangeCoordinatesToGraphView.Invoke(mouseScreenPosition);
+            var position = editor.ChangeCoordinatesToGraphView(mouseScreenPosition);
             Undo.RecordObject(currentChain, "Create Node Data With Connection");
             var nodeView = CreateNode(nodeType, currentChain, position);
 
@@ -195,7 +204,7 @@ namespace Tomoe.MissionSystem.Editor
                 input = inputPort,
                 Data = connection
             };
-            edge.OnEdgeSelected += element => OnGraphElementSelected?.Invoke(element);
+            edge.OnEdgeSelected += element => editor.PopulateInspector(element);
             edge.input.Connect(edge);
             edge.output.Connect(edge);
             AddElement(edge);
@@ -206,11 +215,12 @@ namespace Tomoe.MissionSystem.Editor
         {
             var connection = new Connection()
             {
-                InputMCNode = inputNode,
-                OutputMCNode = outputNode,
+                InputMCNode = inputNode.Guid,
+                OutputMCNode = outputNode.Guid,
             };
-            outputNode.OutputConnections.Add(connection);
-            inputNode.InputConnections.Add(connection);
+            outputNode.OutputConnections.Add(connection.Guid);
+            inputNode.InputConnections.Add(connection.Guid);
+            currentChain.Connections.Add(connection);
             return connection;
         }
 
@@ -241,7 +251,7 @@ namespace Tomoe.MissionSystem.Editor
                 {
                     var nodeView = (MissionChainNode)Activator.CreateInstance(type, new object[] { data, (Func<EdgeConnectorListener>)NodeViewOnOnCreateEdgeConnector });
                     nodeView.SetPosition(new Rect(viewPosition, nodeView.GetPosition().size)); // 使用默认节点大小
-                    nodeView.OnNodeViewSelected += element => OnGraphElementSelected?.Invoke(element);
+                    nodeView.OnNodeViewSelected += element => editor.PopulateInspector(element);
                     return nodeView;
                 }
             }

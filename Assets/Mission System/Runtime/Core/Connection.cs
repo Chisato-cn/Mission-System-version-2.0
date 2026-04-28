@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Tomoe.MissionSystem.Runtime
@@ -7,14 +8,14 @@ namespace Tomoe.MissionSystem.Runtime
     public class Connection
     {
         [SerializeField] private string guid = System.Guid.NewGuid().ToString();
-        [SerializeReference, HideInInspector] private MCNode inputMCNode;
-        [SerializeReference, HideInInspector] private MCNode outputMCNode;
+        [SerializeField, HideInInspector] private string inputMCNode;
+        [SerializeField, HideInInspector] private string outputMCNode;
         
         [SerializeField] private bool isValid;
         [SerializeField] private bool isParallelConnection;
         
         [SerializeField] private bool hasCondition;
-        [SerializeReference] private Condition condition;
+        [SerializeReference] private Condition[] conditions;
         
         public bool IsParallelConnection => isParallelConnection;
         
@@ -25,18 +26,19 @@ namespace Tomoe.MissionSystem.Runtime
             get
             {
                 if (isValid) return false;
-                if (!hasCondition || condition == null) return false;
-                return condition.IsConditionMet;
+                if (!hasCondition || conditions == null) return false;
+                
+                return conditions.All(c => c.IsConditionMet);
             }
         }
 
-        public MCNode InputMCNode
+        public string InputMCNode
         {
             get => inputMCNode;
             set => inputMCNode = value;
         }
 
-        public MCNode OutputMCNode
+        public string OutputMCNode
         {
             get => outputMCNode;
             set => outputMCNode = value;

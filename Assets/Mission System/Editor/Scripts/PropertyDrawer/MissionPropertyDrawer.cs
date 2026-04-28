@@ -2,11 +2,11 @@ using Tomoe.MissionSystem.Runtime;
 using UnityEditor;
 using UnityEngine.UIElements;
 
-[CustomPropertyDrawer(typeof(Mission))]
-public class MissionPropertyDrawer : PropertyDrawer
+namespace Tomoe.MissionSystem.Editor
 {
-    public override VisualElement CreatePropertyGUI(SerializedProperty property)
+    [CustomPropertyDrawer(typeof(Mission))]
+    public class MissionPropertyDrawer : PropertyDrawer
     {
-        return base.CreatePropertyGUI(property);
+        public override VisualElement CreatePropertyGUI(SerializedProperty property) => new MissionDrawer(property);
     }
 }

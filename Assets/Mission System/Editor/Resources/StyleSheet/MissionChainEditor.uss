@@ -23,3 +23,11 @@ Toolbar {
 #ScrollView {
     margin-top: 5px;
 }
+
+#TopPanel {
+    min-height: 30px;
+}
+
+#LeftPanel {
+    min-width: 15px;
+}

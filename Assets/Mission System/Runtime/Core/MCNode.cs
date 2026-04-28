@@ -19,24 +19,24 @@ namespace Tomoe.MissionSystem.Runtime
     {
         [SerializeField, HideInInspector] private string guid;
         [SerializeField] private NodeType type;
-        [SerializeField] private List<Connection> outputConnections;
+        [SerializeField] private List<string> outputConnections;
         
 #if UNITY_EDITOR
         public Vector2 Position;
-        public List<Connection> InputConnections;
+        public List<string> InputConnections;
 #endif
         
         public NodeType Type => type;
         public string Guid => guid;
-        public List<Connection> OutputConnections => outputConnections;
+        public List<string> OutputConnections => outputConnections;
         
         protected MCNode(NodeType type, MissionChain chain)
         {
             this.type = type;
             guid = System.Guid.NewGuid().ToString();
-            outputConnections = new List<Connection>();
+            outputConnections = new List<string>();
 #if UNITY_EDITOR
-            InputConnections = new List<Connection>();
+            InputConnections = new List<string>();
 #endif
         }
     }

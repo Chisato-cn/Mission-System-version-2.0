@@ -8,7 +8,7 @@ namespace Tomoe.MissionSystem.Editor
     {
         #region 右键菜单辅助函数
 
-        public static void RemoveMenuItem(DropdownMenu menu, string itemName)
+        public static void RemoveMenuItem(UnityEngine.UIElements.DropdownMenu menu, string itemName)
         {
             var items = menu.MenuItems();
             for (int i = 0; i < items.Count; i++)
@@ -21,7 +21,7 @@ namespace Tomoe.MissionSystem.Editor
             }
         }
         
-        public static void RemoveSeparator(DropdownMenu menu)
+        public static void RemoveSeparator(UnityEngine.UIElements.DropdownMenu menu)
         {
             var items = menu.MenuItems();
             for (int i = 0; i < items.Count; i++)
