@@ -158,15 +158,18 @@ namespace Tomoe.MissionSystem.Editor
         
         private void UpdateDataSource(BaseListView listView, SerializedProperty property)
         {
-            // 重新排序
-            var propertyList = new List<SerializedProperty>(property.arraySize);
-            for (int i = 0; i < property.arraySize; i++)
+            if (property.isArray)       // 防止奇怪的报错（因为确信传入的是一个数组的property）
             {
-                propertyList.Add(property.GetArrayElementAtIndex(i));
-            }
+                // 重新排序
+                var propertyList = new List<SerializedProperty>(property.arraySize);
+                for (int i = 0; i < property.arraySize; i++)
+                {
+                    propertyList.Add(property.GetArrayElementAtIndex(i));
+                }
 
-            listView.itemsSource = propertyList;
-            listView.Rebuild();
+                listView.itemsSource = propertyList;
+                listView.Rebuild();
+            }
         }
     }
 }

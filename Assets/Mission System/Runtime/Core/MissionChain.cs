@@ -16,9 +16,9 @@ namespace Tomoe.MissionSystem.Runtime
     [CreateAssetMenu(menuName = "Tomoe/Mission System/Chain")]
     public class MissionChain : ScriptableObject
     {
-        [SerializeField, HideInInspector] private string guid;
-        [SerializeField] private List<Connection> connections;
-        [SerializeReference] private List<MCNode> nodes;
+        [SerializeField] private string guid;
+        [SerializeField] private List<Connection> connections = new List<Connection>();
+        [SerializeReference] private List<MCNode> nodes = new List<MCNode>();
         
         [SerializeField] private MissionChainType missionChainType;
         [SerializeField, TextArea(1, 10)] private string missionChainName;
@@ -32,8 +32,8 @@ namespace Tomoe.MissionSystem.Runtime
         public IReadOnlyDictionary<string, Connection> ReadOnlyConnections;
 
 #if UNITY_EDITOR
-        [HideInInspector] public Vector3 GraphPosition = Vector3.zero;
-        [HideInInspector] public Vector3 GraphScale = Vector3.one;
+        public Vector3 GraphPosition = Vector3.zero;
+        public Vector3 GraphScale = Vector3.one;
         public List<Connection> Connections => connections;
         public List<MCNode> Nodes => nodes;
 #endif
@@ -43,8 +43,6 @@ namespace Tomoe.MissionSystem.Runtime
         /// </summary>
         private void OnEnable()
         {
-            nodes = new List<MCNode>();
-            connections = new List<Connection>();
             if (string.IsNullOrEmpty(guid))
                 guid = System.Guid.NewGuid().ToString();
         }

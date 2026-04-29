@@ -10,43 +10,43 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e29c0ed24025ca4b919479adccaf024, type: 3}
-  m_Name: New Mission Chain
+  m_Name: NNNNN
   m_EditorClassIdentifier: Assembly-CSharp::Tomoe.MissionSystem.Runtime.MissionChain
-  guid: f8d774d8-ba8a-47b4-b79a-b3d994cc5d86
+  guid: f95cd1bc-416e-49af-aa2e-0e2bcdbf9eb3
   connections:
-  - guid: 90cbff56-1b0e-4055-ac33-b0075a6cd325
-    inputMCNode: 4441b0dd-cb0b-4ea5-91cd-4e1359652b67
-    outputMCNode: db7a0bd2-50d4-4849-b315-7dd57cd15c29
+  - guid: ae8e6d79-16d6-40f0-8d2b-cc6b413ec1f0
+    inputMCNode: e2b0ff48-86a8-480a-b2d1-f4c5156c79b5
+    outputMCNode: d550e499-762d-4f3b-992f-569832dbe667
     isValid: 0
     isParallelConnection: 0
     hasCondition: 0
     conditions: []
   nodes:
-  - rid: 2229735484370976845
-  - rid: 2229735484370976846
+  - rid: 2229735484370976833
+  - rid: 2229735484370976834
   missionChainType: 0
-  missionChainName: "\u6D4B\u8BD5"
+  missionChainName: 2222
   missionChainDescription: 
   GraphPosition: {x: 0, y: 0, z: 0}
   GraphScale: {x: 1, y: 1, z: 1}
   references:
     version: 2
     RefIds:
-    - rid: 2229735484370976845
+    - rid: 2229735484370976833
       type: {class: MCStartNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
       data:
-        guid: db7a0bd2-50d4-4849-b315-7dd57cd15c29
+        guid: d550e499-762d-4f3b-992f-569832dbe667
         type: 0
         outputConnections:
-        - 90cbff56-1b0e-4055-ac33-b0075a6cd325
+        - ae8e6d79-16d6-40f0-8d2b-cc6b413ec1f0
         Position: {x: 350, y: 300}
         InputConnections: []
-    - rid: 2229735484370976846
+    - rid: 2229735484370976834
       type: {class: MCEndNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
       data:
-        guid: 4441b0dd-cb0b-4ea5-91cd-4e1359652b67
+        guid: e2b0ff48-86a8-480a-b2d1-f4c5156c79b5
         type: 1
         outputConnections: []
         Position: {x: 500, y: 300}
         InputConnections:
-        - 90cbff56-1b0e-4055-ac33-b0075a6cd325
+        - ae8e6d79-16d6-40f0-8d2b-cc6b413ec1f0

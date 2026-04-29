@@ -11,11 +11,12 @@
                         <ui:VisualElement name="InspectorContainer" style="flex-grow: 1;"/>
                     </ui:ScrollView>
                 </ui:VisualElement>
-                <ui:VisualElement name="BottomPanel" style="flex-grow: 1;">
+                <ui:VisualElement name="BottomPanel">
                     <uie:Toolbar>
                         <ui:Label text="Project"/>
                     </uie:Toolbar>
-                    <ui:ScrollView>
+                    <uie:ToolbarSearchField style="width: initial;"/>
+                    <ui:ScrollView name="ScrollView">
                         <ui:VisualElement name="ProjectContainer" style="flex-grow: 1;"/>
                     </ui:ScrollView>
                 </ui:VisualElement>

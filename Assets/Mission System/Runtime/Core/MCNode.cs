@@ -17,7 +17,7 @@ namespace Tomoe.MissionSystem.Runtime
     [Serializable]
     public abstract class MCNode
     {
-        [SerializeField, HideInInspector] private string guid;
+        [SerializeField] private string guid;
         [SerializeField] private NodeType type;
         [SerializeField] private List<string> outputConnections;
         

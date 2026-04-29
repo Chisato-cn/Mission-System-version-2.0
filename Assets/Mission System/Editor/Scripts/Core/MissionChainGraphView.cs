@@ -16,8 +16,8 @@ namespace Tomoe.MissionSystem.Editor
         private MissionChainSearchTree searchTree;
         
         private MissionChainEditor editor;
-        public Edge TempEdge { get; set; }
         private MissionChain currentChain => editor.MissionChain;
+        public Edge TempEdge { get; set; }
         
         public event Action OnWindowFocusChanged; 
         
@@ -42,6 +42,30 @@ namespace Tomoe.MissionSystem.Editor
 
         public void PopulateGraph()
         {
+            DeleteElements(graphElements);
+            
+            if (currentChain.Nodes.Count == 0)
+            {
+                var start = CreateNode(typeof(MCStartNode), new Vector2(350, 300));
+                var end = CreateNode(typeof(MCEndNode), new Vector2(500, 300));
+                var connection = MakeConnection(start.Node, end.Node);
+                MakeEdge(start.OutputPort, end.InputPort, connection);
+                return;
+            }
+
+            foreach (MCNode node in currentChain.Nodes)
+            {
+                CreateNode(node, node.Position);
+            }
+
+            var nodeGraphs = nodes.Select(node => (MissionChainNode)node)
+                .ToDictionary(view => view.Node.Guid, view => view);
+            foreach (Connection connection in currentChain.Connections)
+            {
+                var outputNodeView = nodeGraphs[connection.OutputMCNode];
+                var inputNodeView = nodeGraphs[connection.InputMCNode];
+                MakeEdge(outputNodeView.OutputPort, inputNodeView.InputPort, connection);
+            }
         }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -59,6 +83,8 @@ namespace Tomoe.MissionSystem.Editor
         
         private new GraphViewChange GraphViewChanged(GraphViewChange graphViewChange)
         {
+            if (editor.IsChainChangedDueToClearGraph) return graphViewChange;
+            
             if (graphViewChange.edgesToCreate is { Count: > 0 })
             {
                 Undo.RecordObject(currentChain, "Create Connections");
@@ -156,13 +182,14 @@ namespace Tomoe.MissionSystem.Editor
                     startPort.node != port.node && // 不能自己连接自己
                     startPort.direction != port.direction) // 不能input连input output连output
                 .ToList();
+            
         }
 
         private void SearchTreeOnEntrySelected(Type nodeType, Vector2 mouseScreenPosition)
         {
             var position = editor.ChangeCoordinatesToGraphView(mouseScreenPosition);
             Undo.RecordObject(currentChain, "Create Node Data With Connection");
-            var nodeView = CreateNode(nodeType, currentChain, position);
+            var nodeView = CreateNode(nodeType, position);
 
             // 临时edge不存在，无需处理连接
             if (TempEdge == null) return;
@@ -224,18 +251,20 @@ namespace Tomoe.MissionSystem.Editor
             return connection;
         }
 
-        private MissionChainNode CreateNode(Type nodeType, MissionChain missionChain, Vector2 viewPosition)
+        private MissionChainNode CreateNode(Type nodeType, Vector2 viewPosition) =>
+            CreateNode(CreateNodeData(nodeType), viewPosition);
+        
+        private MissionChainNode CreateNode(MCNode nodeData, Vector2 viewPosition)
         {
-            var nodeData = CreateNodeData(nodeType, missionChain);
             var nodeView = CreateNodeView(nodeData, viewPosition);
             AddElement(nodeView);
             return nodeView;
         }
 
-        private MCNode CreateNodeData(Type nodeType, MissionChain chain)
+        private MCNode CreateNodeData(Type nodeType)
         {
-            var node= (MCNode)Activator.CreateInstance(nodeType, new object[] { chain });
-            chain.Nodes.Add(node);
+            var node= (MCNode)Activator.CreateInstance(nodeType, new object[] { currentChain });
+            currentChain.Nodes.Add(node);
             return node;
         }
 

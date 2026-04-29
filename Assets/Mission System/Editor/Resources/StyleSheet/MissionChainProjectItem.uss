@@ -1,1 +1,56 @@
+.mission-chain-project-item {
+    height: 30px;
+    background-color: rgb(88, 88, 88);
+    border-width: 0;
+    border-left-width: 5px;
+    border-left-color: rgb(255, 255, 255);
+    border-radius: 0;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin: 0;
+    margin-bottom: 5px;
+    flex-direction: row;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-right-width: 0;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
 
+#ChainName {
+    top: 0;
+    bottom: 0;
+    left: 30px;
+    right: 10px;
+    flex-grow: 1;
+    margin: 0;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    position: absolute;
+}
+
+#ChainIcon {
+    height: 20px;
+    width: 20px;
+    left: 5px;
+    margin: 0;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    position: absolute;
+}
+
+.selected {
+    background-color: rgba(0, 26, 255, 0.29);
+    margin-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-left-color: rgb(0, 122, 255);
+    border-left-width: 5px;
+    border-right-color: rgba(0, 122, 255, 0);
+    border-top-color: rgba(0, 122, 255, 0);
+    border-bottom-color: rgba(0, 122, 255, 0);
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}

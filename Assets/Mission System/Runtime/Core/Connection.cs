@@ -8,8 +8,8 @@ namespace Tomoe.MissionSystem.Runtime
     public class Connection
     {
         [SerializeField] private string guid = System.Guid.NewGuid().ToString();
-        [SerializeField, HideInInspector] private string inputMCNode;
-        [SerializeField, HideInInspector] private string outputMCNode;
+        [SerializeField] private string inputMCNode;
+        [SerializeField] private string outputMCNode;
         
         [SerializeField] private bool isValid;
         [SerializeField] private bool isParallelConnection;

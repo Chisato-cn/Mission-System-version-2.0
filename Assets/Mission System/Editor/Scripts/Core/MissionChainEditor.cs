@@ -3,67 +3,181 @@ using System.Linq;
 using System.Reflection;
 using Tomoe.MissionSystem.Runtime;
 using UnityEditor;
+using UnityEditor.Callbacks;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.Search;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace Tomoe.MissionSystem.Editor
 {
     public class MissionChainEditor : EditorWindow
     {
-        [SerializeField]
-        private VisualTreeAsset m_VisualTreeAsset = default;
+        private static MissionChainEditor instance;
         
-        [SerializeField] private MissionChain chain;
-        
-        public MissionChain MissionChain => chain;
-
-        [MenuItem("Window/UI Toolkit/MissionChainEditor")]
-        public static void ShowExample()
+        [OnOpenAsset]
+        public static bool OpenAsset(int entityID, int line)
         {
-            MissionChainEditor wnd = GetWindow<MissionChainEditor>();
-            wnd.titleContent = new GUIContent("MissionChainEditor");
+            Object obj = EditorUtility.EntityIdToObject(entityID);
+            if (obj is MissionChain missionChain)
+            {
+                if (instance == null)
+                {
+                    instance = GetWindow<MissionChainEditor>();
+                    instance.titleContent = new GUIContent("Mission Chain Editor");
+                } 
+                else instance.SaveGraph();
+                
+                instance.PopulateWindow(missionChain);
+                return true;
+            }
+            
+            return false;
         }
 
+        private void SaveGraph()
+        {
+            EditorUtility.SetDirty(chain);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+        
         private MissionChainGraphView graphView;
         private VisualElement inspectorContainer;
         private VisualElement projectContainer;
+        private ToolbarSearchField projectSearchField;
         private int windowFocusChangedTimes;
-
+        
+        /// <summary>
+        /// key是chain的guid
+        /// </summary>
+        private Dictionary<string, (MissionChain asset, SerializedObject serializedObject)> chains;
         private SerializedObject serializedObject;
+        private MissionChain chain;
+        private QueryEngine<MissionChain> queryEngine;
+        
+        public MissionChain MissionChain => chain;
+        public bool IsChainChangedDueToClearGraph { get; set; }
         
         public void CreateGUI()
         {
-            m_VisualTreeAsset.CloneTree(rootVisualElement);
-            serializedObject?.Dispose();
-            serializedObject = new SerializedObject(chain);
+            VisualTreeAsset visualTree = Resources.Load<VisualTreeAsset>("VisualTree/MissionChainEditor");
+            visualTree.CloneTree(rootVisualElement);
+            
+            // 初始化字典
+            chains = new Dictionary<string, (MissionChain asset, SerializedObject serializedObject)>();
+            string[] guids = AssetDatabase.FindAssets("t:MissionChain");
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                MissionChain asset = AssetDatabase.LoadAssetAtPath<MissionChain>(path);
+
+                if (asset != null) chains.Add(asset.Guid, (asset, new SerializedObject(asset)));
+            }
+            // 初始化模糊搜索
+            queryEngine = new QueryEngine<MissionChain>();
+            queryEngine.SetSearchDataCallback(missionChain => new List<string>(){ missionChain.Name });
+            // 设置模糊搜索匹配器
+            queryEngine.SetSearchWordMatcher((searchWord, isExact, comparisonOption, searchData) =>
+            {
+                // 参数说明：
+                // searchWord: 用户输入的搜索词
+                // isExact: 是否要求精确匹配（通常为false）
+                // comparisonOption: 字符串比较选项
+                // searchData: 从SetSearchDataCallback返回的数组中的一个元素
+                
+                if (string.IsNullOrEmpty(searchWord) || string.IsNullOrEmpty(searchData)) return false;
+                
+                // 如果要求精确匹配
+                if (isExact) return string.Equals(searchData, searchWord, comparisonOption);
+                // 使用 FuzzySearch.FuzzyMatch 进行模糊匹配
+                return FuzzySearch.FuzzyMatch(searchWord, searchData);
+            });
             
             windowFocusChanged -= SearchWindowOnwindowFocusChanged;
             windowFocusChanged += SearchWindowOnwindowFocusChanged;
+            Undo.undoRedoPerformed -= UndoRedoPerformed;
+            Undo.undoRedoPerformed += UndoRedoPerformed;
+            
+            inspectorContainer = rootVisualElement.Q<VisualElement>("InspectorContainer");
+            projectContainer = rootVisualElement.Q<VisualElement>("ProjectContainer");
             
             graphView = new MissionChainGraphView(this);
             graphView.OnWindowFocusChanged += () => windowFocusChangedTimes = 3;
             rootVisualElement.Q<VisualElement>("GraphViewContainer").Add(graphView);
             
-            inspectorContainer = rootVisualElement.Q<VisualElement>("InspectorContainer");
-            projectContainer = rootVisualElement.Q<VisualElement>("ProjectContainer");
-            projectContainer.RegisterCallback<PointerDownEvent>(evt =>
+            var bottomPanel = rootVisualElement.Q<VisualElement>("BottomPanel");
+            bottomPanel.AddManipulator(new DropdownMenuManipulator(menu =>
             {
-                
-            });
+                menu.AppendAction("Create Chain Asset", action =>
+                {
+                    var newChain = CreateInstance<MissionChain>();
+                    
+                    // 弹出 Unity 的资源保存对话框（会在项目内选择）
+                    string path = EditorUtility.SaveFilePanelInProject(
+                        "Save Mission Chain Asset",     // 对话框标题
+                        "NewMissionChain",              // 默认文件名
+                        "asset",                        // 文件扩展名
+                        "Save the mission chain asset"  // 提示信息
+                    );
+                    
+                    if (!string.IsNullOrEmpty(path))    // 用户点击了保存
+                    {
+                        AssetDatabase.CreateAsset(newChain, path);
+                        AssetDatabase.SaveAssets();
+                        AssetDatabase.Refresh();
             
-            graphView.PopulateGraph();
+                        // 聚焦到新创建的资源
+                        Selection.activeObject = newChain;
+                        EditorUtility.FocusProjectWindow();
+                        
+                        // 刷新界面
+                        chains[newChain.Guid] = (newChain, new SerializedObject(newChain));
+                        PopulateProject();
+                    }
+                    // 用户点击了取消
+                    else DestroyImmediate(newChain);
+                });
+            }, MouseButton.RightMouse, true));
+            
+            projectSearchField = bottomPanel.Q<ToolbarSearchField>();
+            projectSearchField.RegisterValueChangedCallback(evt => PopulateProject(evt.newValue));
+        }
+
+        private void UndoRedoPerformed()
+        {
+            
         }
 
         private void OnDisable()
         {
+            SaveGraph();
+            Undo.undoRedoPerformed -= UndoRedoPerformed;
             windowFocusChanged -= SearchWindowOnwindowFocusChanged;
+            foreach (var tuple in chains.Values)
+            {
+                tuple.serializedObject?.Dispose();
+            }
+            chains.Clear();
         }
 
-        public void PopulateWindow(MissionChain chain)
+        private void PopulateWindow(MissionChain chain)
         {
+            // 数据初始化
             this.chain = chain;
+            if (!chains.TryGetValue(chain.Guid, out var tuple))
+            {
+                // 防止特殊情况：窗口已经打开，但是在unity中手动创建missionChain资产，然后双击打开，此时这个资产并未被缓存到字典中
+                serializedObject = new SerializedObject(chain);
+                chains[chain.Guid] = (chain, serializedObject);
+            }
+            else serializedObject = tuple.serializedObject;
             
+            graphView.PopulateGraph();
+            PopulateInspector(null);
+            PopulateProject();
         }
         
         public void PopulateInspector(GraphElement element)
@@ -186,9 +300,42 @@ namespace Tomoe.MissionSystem.Editor
             }
         }
 
-        private void PopulateProject()
+        private void PopulateProject(string missionChainName = null)
         {
-            
+            projectContainer.Clear();
+            if (string.IsNullOrEmpty(missionChainName))
+            {
+                foreach (var pair in chains)
+                {
+                    var item = new MissionChainProjectItem(this, pair.Value.serializedObject);
+                    if (pair.Key == chain.Guid) 
+                        item.OnSelected();
+                    else item.OnDeselected();
+                    projectContainer.Add(item);
+                }
+            }
+            else
+            {
+                Debug.Log(missionChainName);
+                var parsedQuery = queryEngine.ParseQuery(missionChainName);
+                if (!parsedQuery.valid) return;
+
+                var tempList = new List<MissionChain>();
+                foreach (var tuple in chains.Values)
+                {
+                    tempList.Add(tuple.asset);
+                }
+
+                var missionChains = parsedQuery.Apply(tempList).ToList();
+                foreach (MissionChain missionChain in missionChains)
+                {   
+                    var item = new MissionChainProjectItem(this, chains[missionChain.Guid].serializedObject);
+                    if (missionChain.Guid == chain.Guid) 
+                        item.OnSelected();
+                    else item.OnDeselected();
+                    projectContainer.Add(item);
+                }
+            }
         }
         
         private void SearchWindowOnwindowFocusChanged()
@@ -208,6 +355,13 @@ namespace Tomoe.MissionSystem.Editor
             Vector2 offset = localPosition - position.position;
             Vector2 worldPosition = rootVisualElement.ChangeCoordinatesTo(rootVisualElement.parent, offset);
             return graphView.contentViewContainer.WorldToLocal(worldPosition);
+        }
+
+        public void OpenAssetBasedProjectItem(string missionChainGuid)
+        {
+            IsChainChangedDueToClearGraph = true;
+            SaveGraph();
+            PopulateWindow(chains[missionChainGuid].asset);
         }
     }
 }
