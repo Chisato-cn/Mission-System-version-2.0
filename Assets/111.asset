@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e29c0ed24025ca4b919479adccaf024, type: 3}
+  m_Name: 111
+  m_EditorClassIdentifier: Assembly-CSharp::Tomoe.MissionSystem.Runtime.MissionChain
+  guid: 9ce0ef4a-0b6d-4700-a17c-5a9cc8fa27be
+  connections:
+  - guid: 6be4f980-1622-4748-a37c-21ec1dfc1f7b
+    inputMCNode: 264623e8-895b-47e8-9238-9821db09f186
+    outputMCNode: 518e386b-935e-4fd4-8ccc-d34a4c474ca9
+    isValid: 0
+    isParallelConnection: 0
+    hasCondition: 0
+    conditions: []
+  nodes:
+  - rid: 2229735497126903873
+  - rid: 2229735497126903874
+  missionChainType: 0
+  missionChainName: 
+  missionChainDescription: 
+  GraphPosition: {x: 0, y: 0, z: 0}
+  GraphScale: {x: 1, y: 1, z: 1}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2229735497126903873
+      type: {class: MCStartNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
+      data:
+        guid: 518e386b-935e-4fd4-8ccc-d34a4c474ca9
+        type: 0
+        outputConnections:
+        - 6be4f980-1622-4748-a37c-21ec1dfc1f7b
+        Position: {x: 350, y: 300}
+        InputConnections: []
+    - rid: 2229735497126903874
+      type: {class: MCEndNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
+      data:
+        guid: 264623e8-895b-47e8-9238-9821db09f186
+        type: 1
+        outputConnections: []
+        Position: {x: 500, y: 300}
+        InputConnections:
+        - 6be4f980-1622-4748-a37c-21ec1dfc1f7b

@@ -352,8 +352,10 @@ namespace Tomoe.MissionSystem.Editor
 
         public void OpenAssetBasedProjectItem(string missionChainGuid)
         {
-            IsChainChangedDueToClearGraph = true;
             SaveGraph();
+            IsChainChangedDueToClearGraph = true;
+            // 防止跨资产撤回，清空撤销栈
+            Undo.ClearAll();
             PopulateWindow(chains[missionChainGuid].asset);
         }
     }

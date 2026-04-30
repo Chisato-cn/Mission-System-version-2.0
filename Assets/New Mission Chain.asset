@@ -35,13 +35,21 @@ MonoBehaviour:
     isParallelConnection: 0
     hasCondition: 0
     conditions: []
+  - guid: cb0989bf-abd2-42f3-b538-c961d9f5279a
+    inputMCNode: ae8166b2-cb26-4487-ac55-7b7f9d66c085
+    outputMCNode: 30802f1d-43f2-4002-ab39-a2c039913bf1
+    isValid: 0
+    isParallelConnection: 0
+    hasCondition: 0
+    conditions: []
   nodes:
   - rid: 2229735494708887662
   - rid: 2229735494708887663
   - rid: 2229735494708887664
   - rid: 2229735494708887665
+  - rid: 2229735497126903875
   missionChainType: 0
-  missionChainName: 
+  missionChainName: "\u6D4B\u8BD5"
   missionChainDescription: 
   GraphPosition: {x: 0, y: 0, z: 0}
   GraphScale: {x: 1, y: 1, z: 1}
@@ -55,7 +63,7 @@ MonoBehaviour:
         type: 0
         outputConnections:
         - 13b1a789-be6c-47de-b0d6-1bd9daeadd3d
-        Position: {x: 130.40002, y: 283.19998}
+        Position: {x: 325.5999, y: 347.19998}
         InputConnections: []
     - rid: 2229735494708887663
       type: {class: MCEndNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
@@ -76,7 +84,8 @@ MonoBehaviour:
         - 41d1e3e6-e63d-4071-b504-0c2c05b23257
         - e1b17868-45e3-426d-9618-fdb62ccd3aee
         Position: {x: 182.40002, y: 170.40001}
-        InputConnections: []
+        InputConnections:
+        - cb0989bf-abd2-42f3-b538-c961d9f5279a
         mission:
           missionId: b0e01683-647c-4853-bf9e-ca6e4126a41e|ae8166b2-cb26-4487-ac55-7b7f9d66c085
           missionName: 
@@ -94,3 +103,20 @@ MonoBehaviour:
         Position: {x: 500, y: 170.40001}
         InputConnections:
         - 41d1e3e6-e63d-4071-b504-0c2c05b23257
+    - rid: 2229735497126903875
+      type: {class: MCMissionNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
+      data:
+        guid: 30802f1d-43f2-4002-ab39-a2c039913bf1
+        type: 3
+        outputConnections:
+        - cb0989bf-abd2-42f3-b538-c961d9f5279a
+        Position: {x: 104, y: 298.39996}
+        InputConnections: []
+        mission:
+          missionId: b0e01683-647c-4853-bf9e-ca6e4126a41e|30802f1d-43f2-4002-ab39-a2c039913bf1
+          missionName: 
+          missionDescription: 
+          missionRequirementMode: 0
+          customRequirementCompleteCount: -1
+          missionRequirements: []
+          missionRewards: []

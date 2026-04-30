@@ -162,6 +162,7 @@ namespace Tomoe.MissionSystem.Editor
 
             if (undoMode == UndoMode.Create)
             {
+                // 消耗掉
                 undoMode = UndoMode.None;
                 return graphViewChange;
             }
