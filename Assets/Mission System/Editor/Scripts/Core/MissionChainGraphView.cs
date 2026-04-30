@@ -32,6 +32,9 @@ namespace Tomoe.MissionSystem.Editor
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
 
+            Undo.undoRedoPerformed += UndoRedoPerformed;
+            RegisterCallback<DetachFromPanelEvent>(evt => Undo.undoRedoPerformed -= UndoRedoPerformed);
+            
             this.editor = editor;
             graphViewChanged += GraphViewChanged;
             searchTree = ScriptableObject.CreateInstance<MissionChainSearchTree>();
@@ -40,11 +43,36 @@ namespace Tomoe.MissionSystem.Editor
                 SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), searchTree);
         }
 
+        private void UndoRedoPerformed()
+        { 
+            editor.SerializedObject.Update();
+            currentChain.RefreshProperty();
+            
+            var nodeGraphs = nodes.Select(node => (MissionChainNode)node)
+                .ToDictionary(view => view.Node.Guid, view => view);
+            foreach (var node in currentChain.ReadOnlyNodesDict)
+            {
+                if (!nodeGraphs.ContainsKey(node.Key)) CreateNode(node.Value, node.Value.Position);
+            }
+            // 刷新ui数据，给下方edge的创建使用
+            nodeGraphs = nodes.Select(node => (MissionChainNode)node)
+                .ToDictionary(view => view.Node.Guid, view => view);
+
+            var edgeGraphs = edges.Select(edge => (ConnectionView)edge)
+                .ToDictionary(view => view.Data.Guid, view => view);
+            foreach (var connection in currentChain.ReadOnlyConnectionsList)
+            {
+                if (!edgeGraphs.TryGetValue(connection.Guid, out ConnectionView view))
+                    MakeEdge(nodeGraphs[connection.OutputMCNode].OutputPort, nodeGraphs[connection.InputMCNode].InputPort, connection);
+                else view.Data = connection;
+            }
+        }
+
         public void PopulateGraph()
         {
             DeleteElements(graphElements);
             
-            if (currentChain.Nodes.Count == 0)
+            if (currentChain.ReadOnlyNodesList.Count == 0)
             {
                 var start = CreateNode(typeof(MCStartNode), new Vector2(350, 300));
                 var end = CreateNode(typeof(MCEndNode), new Vector2(500, 300));
@@ -53,14 +81,14 @@ namespace Tomoe.MissionSystem.Editor
                 return;
             }
 
-            foreach (MCNode node in currentChain.Nodes)
+            foreach (MCNode node in currentChain.ReadOnlyNodesList)
             {
                 CreateNode(node, node.Position);
             }
 
             var nodeGraphs = nodes.Select(node => (MissionChainNode)node)
                 .ToDictionary(view => view.Node.Guid, view => view);
-            foreach (Connection connection in currentChain.Connections)
+            foreach (Connection connection in currentChain.ReadOnlyConnectionsList)
             {
                 var outputNodeView = nodeGraphs[connection.OutputMCNode];
                 var inputNodeView = nodeGraphs[connection.InputMCNode];
@@ -83,7 +111,12 @@ namespace Tomoe.MissionSystem.Editor
         
         private new GraphViewChange GraphViewChanged(GraphViewChange graphViewChange)
         {
-            if (editor.IsChainChangedDueToClearGraph) return graphViewChange;
+            if (editor.IsChainChangedDueToClearGraph)
+            {
+                // 消耗掉
+                editor.IsChainChangedDueToClearGraph = false;
+                return graphViewChange;
+            }
             
             if (graphViewChange.edgesToCreate is { Count: > 0 })
             {
@@ -98,14 +131,15 @@ namespace Tomoe.MissionSystem.Editor
                         InputMCNode = inputNodeView.Node.Guid,
                         OutputMCNode = outputNodeView.Node.Guid
                     };
+                    outputNodeView.Node.OutputConnections.Add(connection.Guid);
+                    inputNodeView.Node.InputConnections.Add(connection.Guid);
+                    currentChain.AddConnection(connection);
                     
                     var connectionView = (ConnectionView)edge;
                     connectionView.Data = connection;
                     connectionView.OnEdgeSelected += element => editor.PopulateInspector(element);
-                    
-                    outputNodeView.Node.OutputConnections.Add(connection.Guid);
-                    inputNodeView.Node.InputConnections.Add(connection.Guid);
                 }
+                editor.SerializedObject.Update();
             }
 
             if (graphViewChange.elementsToRemove is { Count: > 0 }) 
@@ -139,8 +173,8 @@ namespace Tomoe.MissionSystem.Editor
                         connectionToDelete.Add(connectionGuid);
                         
                         // 输入节点断开连接
-                        var inputMCNodeGuid = currentChain.ReadOnlyConnections[connectionGuid].InputMCNode;
-                        var inputNode = currentChain.ReadOnlyNodes[inputMCNodeGuid];
+                        var inputMCNodeGuid = currentChain.ReadOnlyConnectionsDict[connectionGuid].InputMCNode;
+                        var inputNode = currentChain.ReadOnlyNodesDict[inputMCNodeGuid];
                         inputNode.InputConnections.RemoveAll(conn => conn == connectionGuid);
                     }
                     foreach (string connectionGuid in node.Node.InputConnections)
@@ -148,15 +182,17 @@ namespace Tomoe.MissionSystem.Editor
                         // 记录需要移除的connection的id
                         connectionToDelete.Add(connectionGuid);
                         
-                        var outputMCNodeGuid = currentChain.ReadOnlyConnections[connectionGuid].OutputMCNode;
-                        var outputNode = currentChain.ReadOnlyNodes[outputMCNodeGuid];
+                        var outputMCNodeGuid = currentChain.ReadOnlyConnectionsDict[connectionGuid].OutputMCNode;
+                        var outputNode = currentChain.ReadOnlyNodesDict[outputMCNodeGuid];
                         outputNode.OutputConnections.RemoveAll(conn => conn == connectionGuid);
                     }
                 
                     node.Node.OutputConnections.Clear();
                     node.Node.InputConnections.Clear();
-                    currentChain.Nodes.Remove(node.Node);
+                    currentChain.RemoveNode(node.Node);
                 }
+                editor.SerializedObject.Update();
+                
                 // 删除边
                 foreach (Edge edge in edgeToDelete)
                 {
@@ -166,8 +202,9 @@ namespace Tomoe.MissionSystem.Editor
                     var edgeGuid = ((ConnectionView)edge).Data.Guid;
                     inputNode.InputConnections.Remove(edgeGuid);
                     outputNode.OutputConnections.Remove(edgeGuid);
-                    currentChain.Connections.RemoveAll(connection => connection.Guid == edgeGuid);
+                    currentChain.RemoveAllConnection(connection => connection.Guid == edgeGuid);
                 }
+                editor.SerializedObject.Update();
             }
             
             return graphViewChange;
@@ -182,7 +219,6 @@ namespace Tomoe.MissionSystem.Editor
                     startPort.node != port.node && // 不能自己连接自己
                     startPort.direction != port.direction) // 不能input连input output连output
                 .ToList();
-            
         }
 
         private void SearchTreeOnEntrySelected(Type nodeType, Vector2 mouseScreenPosition)
@@ -247,7 +283,9 @@ namespace Tomoe.MissionSystem.Editor
             };
             outputNode.OutputConnections.Add(connection.Guid);
             inputNode.InputConnections.Add(connection.Guid);
-            currentChain.Connections.Add(connection);
+            currentChain.AddConnection(connection);
+            editor.SerializedObject.Update();
+            
             return connection;
         }
 
@@ -264,7 +302,8 @@ namespace Tomoe.MissionSystem.Editor
         private MCNode CreateNodeData(Type nodeType)
         {
             var node= (MCNode)Activator.CreateInstance(nodeType, new object[] { currentChain });
-            currentChain.Nodes.Add(node);
+            currentChain.AddNode(node);
+            editor.SerializedObject.Update();
             return node;
         }
 

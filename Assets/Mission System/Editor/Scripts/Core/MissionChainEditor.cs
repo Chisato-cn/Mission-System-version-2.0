@@ -59,6 +59,7 @@ namespace Tomoe.MissionSystem.Editor
         private QueryEngine<MissionChain> queryEngine;
         
         public MissionChain MissionChain => chain;
+        public SerializedObject SerializedObject => serializedObject;
         public bool IsChainChangedDueToClearGraph { get; set; }
         
         public void CreateGUI()
@@ -98,8 +99,6 @@ namespace Tomoe.MissionSystem.Editor
             
             windowFocusChanged -= SearchWindowOnwindowFocusChanged;
             windowFocusChanged += SearchWindowOnwindowFocusChanged;
-            Undo.undoRedoPerformed -= UndoRedoPerformed;
-            Undo.undoRedoPerformed += UndoRedoPerformed;
             
             inspectorContainer = rootVisualElement.Q<VisualElement>("InspectorContainer");
             projectContainer = rootVisualElement.Q<VisualElement>("ProjectContainer");
@@ -146,15 +145,9 @@ namespace Tomoe.MissionSystem.Editor
             projectSearchField.RegisterValueChangedCallback(evt => PopulateProject(evt.newValue));
         }
 
-        private void UndoRedoPerformed()
-        {
-            
-        }
-
         private void OnDisable()
         {
             SaveGraph();
-            Undo.undoRedoPerformed -= UndoRedoPerformed;
             windowFocusChanged -= SearchWindowOnwindowFocusChanged;
             foreach (var tuple in chains.Values)
             {
@@ -192,7 +185,7 @@ namespace Tomoe.MissionSystem.Editor
 
         private void PopulateEdgePropertyView(ConnectionView connectionView)
         {
-            int index = chain.Connections.IndexOf(connectionView.Data);
+            int index = chain.IndexOfConnection(connectionView.Data);
             var edges = serializedObject.FindProperty("connections");
             var prop = edges.GetArrayElementAtIndex(index);
 
@@ -225,7 +218,7 @@ namespace Tomoe.MissionSystem.Editor
         private void PopulateNodePropertyView(MissionChainNode node)
         {
             // 找到对应的节点
-            int index = chain.Nodes.IndexOf(node.Node);
+            int index = chain.IndexOfNode(node.Node);
             var nodes = serializedObject.FindProperty("nodes");
             var prop = nodes.GetArrayElementAtIndex(index);
                 
