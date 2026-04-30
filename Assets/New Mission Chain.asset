@@ -51,7 +51,7 @@ MonoBehaviour:
   missionChainType: 0
   missionChainName: "\u6D4B\u8BD5"
   missionChainDescription: 
-  GraphPosition: {x: 0, y: 0, z: 0}
+  GraphPosition: {x: 52, y: 128, z: 0}
   GraphScale: {x: 1, y: 1, z: 1}
   references:
     version: 2
@@ -63,7 +63,7 @@ MonoBehaviour:
         type: 0
         outputConnections:
         - 13b1a789-be6c-47de-b0d6-1bd9daeadd3d
-        Position: {x: 325.5999, y: 347.19998}
+        Position: {x: 280.00003, y: 201.6}
         InputConnections: []
     - rid: 2229735494708887663
       type: {class: MCEndNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
@@ -71,7 +71,7 @@ MonoBehaviour:
         guid: 1120cca8-c7eb-4ba9-a26b-a894a275e72a
         type: 1
         outputConnections: []
-        Position: {x: 500, y: 298.4}
+        Position: {x: 392.79996, y: 68.79997}
         InputConnections:
         - 13b1a789-be6c-47de-b0d6-1bd9daeadd3d
         - e1b17868-45e3-426d-9618-fdb62ccd3aee
@@ -83,7 +83,7 @@ MonoBehaviour:
         outputConnections:
         - 41d1e3e6-e63d-4071-b504-0c2c05b23257
         - e1b17868-45e3-426d-9618-fdb62ccd3aee
-        Position: {x: 182.40002, y: 170.40001}
+        Position: {x: 131.99994, y: -20.223999}
         InputConnections:
         - cb0989bf-abd2-42f3-b538-c961d9f5279a
         mission:
@@ -100,7 +100,7 @@ MonoBehaviour:
         guid: 8c51209d-428a-44ec-9d5d-32cf60ee3664
         type: 1
         outputConnections: []
-        Position: {x: 500, y: 170.40001}
+        Position: {x: 381.6, y: -77.600006}
         InputConnections:
         - 41d1e3e6-e63d-4071-b504-0c2c05b23257
     - rid: 2229735497126903875
@@ -110,7 +110,7 @@ MonoBehaviour:
         type: 3
         outputConnections:
         - cb0989bf-abd2-42f3-b538-c961d9f5279a
-        Position: {x: 104, y: 298.39996}
+        Position: {x: 53.599976, y: 107.775986}
         InputConnections: []
         mission:
           missionId: b0e01683-647c-4853-bf9e-ca6e4126a41e|30802f1d-43f2-4002-ab39-a2c039913bf1

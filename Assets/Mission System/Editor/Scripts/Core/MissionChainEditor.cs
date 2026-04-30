@@ -39,6 +39,8 @@ namespace Tomoe.MissionSystem.Editor
 
         private void SaveGraph()
         {
+            chain.GraphPosition = graphView.viewTransform.position;
+            chain.GraphScale = graphView.viewTransform.scale;
             EditorUtility.SetDirty(chain);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

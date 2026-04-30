@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/Mission%20System/Editor/Resources/StyleSheet/MissionChainEditor.uss?fileID=7433441132597879392&amp;guid=e58cf2a05c4e1eb49b697477873d7f1f&amp;type=3#MissionChainEditor"/>
     <Tomoe.MissionSystem.Editor.SplitView fixed-pane-initial-dimension="430">
         <ui:VisualElement name="LeftPanel" style="flex-grow: 1;">
-            <Tomoe.MissionSystem.Editor.SplitView orientation="Vertical" fixed-pane-initial-dimension="570">
+            <Tomoe.MissionSystem.Editor.SplitView orientation="Vertical" fixed-pane-initial-dimension="300">
                 <ui:VisualElement name="TopPanel" style="flex-grow: 1;">
                     <uie:Toolbar>
                         <ui:Label text="Inspector"/>

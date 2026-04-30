@@ -27,8 +27,8 @@ MonoBehaviour:
   missionChainType: 0
   missionChainName: 
   missionChainDescription: 
-  GraphPosition: {x: 0, y: 0, z: 0}
-  GraphScale: {x: 1, y: 1, z: 1}
+  GraphPosition: {x: 4.8, y: -7.2, z: 0}
+  GraphScale: {x: 0.8695652, y: 0.8695652, z: 1}
   references:
     version: 2
     RefIds:

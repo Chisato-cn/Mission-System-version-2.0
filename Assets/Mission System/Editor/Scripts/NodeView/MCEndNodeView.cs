@@ -10,6 +10,7 @@ namespace Tomoe.MissionSystem.Editor
         public MCEndNodeView(MCNode node, Func<EdgeConnectorListener> onCreateEdgeConnector) : base(node, onCreateEdgeConnector)
         {
             CreatePort("input", Direction.Input);
+            AddToClassList("end-node");
         }
     }
 }

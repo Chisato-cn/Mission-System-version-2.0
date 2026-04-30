@@ -1,0 +1,36 @@
+/*-----------------------------------------------------------------------------------------------------Start-Node-View*/
+.start-node #title {
+    background-color: rgb(3, 203, 1);
+}
+.start-node #title-label {
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-font-style: bold-and-italic;
+}
+.start-node #contents {
+    background-color: rgba(3, 203, 1, 0.5);
+}
+.start-node #node-border #contents #top #output .port {
+    --port-color: rgb(3, 203, 1);
+}
+.start-node #node-border #contents #top #input .port {
+    --port-color: rgb(3, 203, 1);
+}
+/*-------------------------------------------------------------------------------------------------------End-Node-View*/
+.end-node #title {
+    background-color: rgb(255, 5, 0);
+}
+.end-node #title-label {
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-font-style: bold-and-italic;
+}
+.end-node #contents {
+    background-color: rgba(255, 5, 0, 0.5);
+}
+.end-node #node-border #contents #top #output .port {
+    --port-color: rgb(255, 5, 0);
+}
+.end-node #node-border #contents #top #input .port {
+    --port-color: rgb(255, 5, 0);
+}

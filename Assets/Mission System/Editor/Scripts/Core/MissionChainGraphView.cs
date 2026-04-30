@@ -136,6 +136,8 @@ namespace Tomoe.MissionSystem.Editor
                 var inputNodeView = nodeGraphs[connection.InputMCNode];
                 MakeEdge(outputNodeView.OutputPort, inputNodeView.InputPort, connection);
             }
+
+            UpdateViewTransform(currentChain.GraphPosition, currentChain.GraphScale);
         }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
