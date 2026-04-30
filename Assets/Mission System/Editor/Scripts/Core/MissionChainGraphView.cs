@@ -13,6 +13,21 @@ namespace Tomoe.MissionSystem.Editor
 {
     public class MissionChainGraphView : GraphView
     {
+        private enum UndoMode
+        {
+            /// <summary>
+            /// 撤回了"删除"
+            /// </summary>
+            Delete, 
+            
+            /// <summary>
+            /// 撤回了"创建"
+            /// </summary>
+            Create,
+            
+            None
+        }
+        private UndoMode undoMode;
         private MissionChainSearchTree searchTree;
         
         private MissionChainEditor editor;
@@ -50,21 +65,48 @@ namespace Tomoe.MissionSystem.Editor
             
             var nodeGraphs = nodes.Select(node => (MissionChainNode)node)
                 .ToDictionary(view => view.Node.Guid, view => view);
-            foreach (var node in currentChain.ReadOnlyNodesDict)
-            {
-                if (!nodeGraphs.ContainsKey(node.Key)) CreateNode(node.Value, node.Value.Position);
-            }
-            // 刷新ui数据，给下方edge的创建使用
-            nodeGraphs = nodes.Select(node => (MissionChainNode)node)
-                .ToDictionary(view => view.Node.Guid, view => view);
-
             var edgeGraphs = edges.Select(edge => (ConnectionView)edge)
                 .ToDictionary(view => view.Data.Guid, view => view);
-            foreach (var connection in currentChain.ReadOnlyConnectionsList)
+            
+            // 删除和添加不会同一操作内出现，这是必要条件！
+            undoMode = UndoMode.None;
+            if (nodeGraphs.Count > currentChain.ReadOnlyNodesList.Count ||              // 撤回后，视图个数比数据个数多，即为添加
+                edgeGraphs.Count > currentChain.ReadOnlyConnectionsList.Count) undoMode = UndoMode.Create;
+            else if (nodeGraphs.Count < currentChain.ReadOnlyNodesList.Count ||         // 撤回后，视图个数比数据个数少，即为删除
+                     edgeGraphs.Count < currentChain.ReadOnlyConnectionsList.Count) undoMode = UndoMode.Delete;
+
+            switch (undoMode)
             {
-                if (!edgeGraphs.TryGetValue(connection.Guid, out ConnectionView view))
-                    MakeEdge(nodeGraphs[connection.OutputMCNode].OutputPort, nodeGraphs[connection.InputMCNode].InputPort, connection);
-                else view.Data = connection;
+                case UndoMode.Delete:
+                    foreach (var node in currentChain.ReadOnlyNodesDict)
+                    {
+                        if (!nodeGraphs.ContainsKey(node.Key)) CreateNode(node.Value, node.Value.Position);
+                    }
+                    // 刷新ui数据，给下方edge的创建使用
+                    nodeGraphs = nodes.Select(node => (MissionChainNode)node)
+                        .ToDictionary(view => view.Node.Guid, view => view);
+                    foreach (var connection in currentChain.ReadOnlyConnectionsList)
+                    {
+                        if (!edgeGraphs.TryGetValue(connection.Guid, out ConnectionView view))
+                            MakeEdge(nodeGraphs[connection.OutputMCNode].OutputPort, nodeGraphs[connection.InputMCNode].InputPort, connection);
+                        // 修复引用，有一个很奇怪的bug
+                        else view.Data = connection;
+                    }
+                    break;
+                case UndoMode.Create:
+                    var elementsToDelete = new HashSet<GraphElement>();
+                    foreach (var nodeView in nodeGraphs.Values)
+                    {
+                        if (!currentChain.ReadOnlyNodesDict.ContainsKey(nodeView.Node.Guid))
+                            elementsToDelete.Add(nodeView);
+                    }
+                    foreach (var connectionView in edgeGraphs.Values)
+                    {
+                        if (!currentChain.ReadOnlyConnectionsDict.ContainsKey(connectionView.Data.Guid))
+                            elementsToDelete.Add(connectionView);
+                    }
+                    DeleteElements(elementsToDelete);
+                    break;
             }
         }
 
@@ -115,6 +157,12 @@ namespace Tomoe.MissionSystem.Editor
             {
                 // 消耗掉
                 editor.IsChainChangedDueToClearGraph = false;
+                return graphViewChange;
+            }
+
+            if (undoMode == UndoMode.Create)
+            {
+                undoMode = UndoMode.None;
                 return graphViewChange;
             }
             

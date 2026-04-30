@@ -28,6 +28,13 @@ MonoBehaviour:
     isParallelConnection: 0
     hasCondition: 0
     conditions: []
+  - guid: e1b17868-45e3-426d-9618-fdb62ccd3aee
+    inputMCNode: 1120cca8-c7eb-4ba9-a26b-a894a275e72a
+    outputMCNode: ae8166b2-cb26-4487-ac55-7b7f9d66c085
+    isValid: 0
+    isParallelConnection: 0
+    hasCondition: 0
+    conditions: []
   nodes:
   - rid: 2229735494708887662
   - rid: 2229735494708887663
@@ -59,6 +66,7 @@ MonoBehaviour:
         Position: {x: 500, y: 298.4}
         InputConnections:
         - 13b1a789-be6c-47de-b0d6-1bd9daeadd3d
+        - e1b17868-45e3-426d-9618-fdb62ccd3aee
     - rid: 2229735494708887664
       type: {class: MCMissionNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
       data:
@@ -66,6 +74,7 @@ MonoBehaviour:
         type: 3
         outputConnections:
         - 41d1e3e6-e63d-4071-b504-0c2c05b23257
+        - e1b17868-45e3-426d-9618-fdb62ccd3aee
         Position: {x: 182.40002, y: 170.40001}
         InputConnections: []
         mission:
