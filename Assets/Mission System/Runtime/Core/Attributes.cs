@@ -13,6 +13,7 @@ namespace Tomoe.MissionSystem.Runtime
         }
     }
     
+#if UNITY_EDITOR
     [AttributeUsage(AttributeTargets.Class)]
     public class MCNodeViewAttribute : Attribute
     {
@@ -23,4 +24,33 @@ namespace Tomoe.MissionSystem.Runtime
             DataType = dataType;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class CustomPropertyDrawerTypeAttribute : Attribute
+    {
+        public string DrawerType { get; }
+        
+        public CustomPropertyDrawerTypeAttribute(string drawerType)
+        {
+            DrawerType = drawerType;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class MCNodeViewExtensionStyleAttribute : Attribute
+    {
+        public enum StyleType
+        {
+            TitlePlusContent,
+            LabelPlusValue,
+            IconPlusContent,
+        }
+        public StyleType Style { get; }
+        
+        public MCNodeViewExtensionStyleAttribute(StyleType style)
+        {
+            Style = style;
+        }
+    }
+#endif
 }

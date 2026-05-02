@@ -12,6 +12,8 @@ namespace Tomoe.MissionSystem.Editor
             CreatePort("output", Direction.Output);
             capabilities -= Capabilities.Deletable;
             AddToClassList("start-node");
+
+            title = "【Start】";
         }
     }
 }

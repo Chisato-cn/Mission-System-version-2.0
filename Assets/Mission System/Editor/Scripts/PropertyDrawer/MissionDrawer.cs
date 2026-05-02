@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Tomoe.MissionSystem.Runtime;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -25,6 +26,7 @@ namespace Tomoe.MissionSystem.Editor
             var foldOut = this.Q<Foldout>("Container");
             foldOut.text = property.displayName;
             
+            // todo：修改成不写死的模式
             BindingProperty(this.Q<VisualElement>("Name"), property.FindPropertyRelative("missionName"));
             BindingProperty(this.Q<VisualElement>("Description"), property.FindPropertyRelative("missionDescription"));
             BindingProperty(this.Q<VisualElement>("RequirementMode"), property.FindPropertyRelative("missionRequirementMode"));
@@ -123,11 +125,24 @@ namespace Tomoe.MissionSystem.Editor
                 var elementProperty = items[index];
                 var propertyContainer = element.Q<VisualElement>("property-field-container");
                 propertyContainer.Clear();
-                
-                var propertyField = new PropertyField(elementProperty);
-                propertyField.Bind(elementProperty.serializedObject);
-                propertyField.label = elementProperty.managedReferenceValue.ToString();
-                propertyContainer.Add(propertyField);
+                propertyContainer.Add(new Label(elementProperty.managedReferenceValue.ToString()));
+
+                // 获取真实类型的所有字段
+                var type = elementProperty.managedReferenceValue.GetType();
+                var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                foreach (FieldInfo info in fields)
+                {
+                    var attribute = info.GetCustomAttribute<CustomPropertyDrawerTypeAttribute>();
+                    var prop = elementProperty.FindPropertyRelative(info.Name);
+
+                    if (attribute != null) propertyContainer.Add(GeneratePropertyField(attribute.DrawerType, prop));
+                    else
+                    {
+                        var propertyField = new PropertyField(prop);
+                        propertyField.Bind(elementProperty.serializedObject);
+                        propertyContainer.Add(propertyField);
+                    }
+                }
             };
             
             // 监听重新排序事件
@@ -192,6 +207,17 @@ namespace Tomoe.MissionSystem.Editor
 
             listView.itemsSource = propertyList;
             listView.Rebuild();
+        }
+
+        private VisualElement GeneratePropertyField(string drawerType, SerializedProperty property)
+        {
+            switch (drawerType)
+            {
+                case "ConditionDrawer":
+                    return new ConditionDrawer(property);
+            }
+
+            return null;
         }
     }
 }

@@ -39,7 +39,7 @@ MonoBehaviour:
         type: 0
         outputConnections:
         - 6be4f980-1622-4748-a37c-21ec1dfc1f7b
-        Position: {x: 350, y: 300}
+        Position: {x: 349.59995, y: 299.08008}
         InputConnections: []
     - rid: 2229735497126903874
       type: {class: MCEndNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
@@ -47,6 +47,6 @@ MonoBehaviour:
         guid: 264623e8-895b-47e8-9238-9821db09f186
         type: 1
         outputConnections: []
-        Position: {x: 500, y: 300}
+        Position: {x: 551.52, y: 310.1201}
         InputConnections:
         - 6be4f980-1622-4748-a37c-21ec1dfc1f7b

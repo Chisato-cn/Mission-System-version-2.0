@@ -7,7 +7,9 @@ namespace Tomoe.MissionSystem.Runtime
     public class MCMissionNode : MCNode
     {
         [SerializeField] private Mission mission;
-        
+
+        public Mission Mission => mission;
+
         public MCMissionNode(MissionChain chain) : base(NodeType.Mission, chain)
         {
             mission = new Mission($"{chain.Guid}|{Guid}");

@@ -32,8 +32,8 @@ namespace Tomoe.MissionSystem.Runtime
 
         public IReadOnlyDictionary<string, MCNode> ReadOnlyNodesDict;
         public IReadOnlyDictionary<string, Connection> ReadOnlyConnectionsDict;
-        public IReadOnlyList<Connection> ReadOnlyConnectionsList => connections.AsReadOnly();
-        public IReadOnlyList<MCNode> ReadOnlyNodesList => nodes.AsReadOnly();
+        public IReadOnlyList<Connection> ReadOnlyConnectionsList;
+        public IReadOnlyList<MCNode> ReadOnlyNodesList;
 
 #if UNITY_EDITOR
         public Vector3 GraphPosition = Vector3.zero;
@@ -45,16 +45,20 @@ namespace Tomoe.MissionSystem.Runtime
         /// </summary>
         private void OnEnable()
         {
+            RefreshProperty();
             if (string.IsNullOrEmpty(guid))
                 guid = System.Guid.NewGuid().ToString();
         }
-
-#if UNITY_EDITOR
+        
         public void RefreshProperty()
         {
             ReadOnlyConnectionsDict = connections.ToDictionary(conn => conn.Guid, conn => conn);
+            ReadOnlyConnectionsList = connections.AsReadOnly();
             ReadOnlyNodesDict = nodes.ToDictionary(node => node.Guid, node => node);
+            ReadOnlyNodesList = nodes.AsReadOnly();
         }
+
+#if UNITY_EDITOR
         
         public int IndexOfConnection(Connection connection) => connections.IndexOf(connection);
         
@@ -62,12 +66,14 @@ namespace Tomoe.MissionSystem.Runtime
         {
             connections.Add(connection);
             ReadOnlyConnectionsDict = connections.ToDictionary(conn => conn.Guid, conn => conn);
+            ReadOnlyConnectionsList = connections.AsReadOnly();
         }
         
         public void RemoveAllConnection(Predicate<Connection> func)
         {
             connections.RemoveAll(func);
-            ReadOnlyConnectionsDict = connections.ToDictionary(connection => connection.Guid, connection => connection);
+            ReadOnlyConnectionsDict = connections.ToDictionary(conn => conn.Guid, conn => conn);
+            ReadOnlyConnectionsList = connections.AsReadOnly();
         }
         
         public int IndexOfNode(MCNode node) => nodes.IndexOf(node);
@@ -76,12 +82,14 @@ namespace Tomoe.MissionSystem.Runtime
         {
             nodes.Add(nodeData);
             ReadOnlyNodesDict = nodes.ToDictionary(node => node.Guid, node => node);
+            ReadOnlyNodesList = nodes.AsReadOnly();
         }
         
         public void RemoveNode(MCNode nodeData)
         {
             nodes.Remove(nodeData);
             ReadOnlyNodesDict = nodes.ToDictionary(node => node.Guid, node => node);
+            ReadOnlyNodesList = nodes.AsReadOnly();
         }
 #endif
     }

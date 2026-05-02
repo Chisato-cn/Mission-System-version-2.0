@@ -51,7 +51,7 @@ MonoBehaviour:
   missionChainType: 0
   missionChainName: "\u6D4B\u8BD5"
   missionChainDescription: 
-  GraphPosition: {x: 52, y: 128, z: 0}
+  GraphPosition: {x: 102.4, y: 163.2, z: 0}
   GraphScale: {x: 1, y: 1, z: 1}
   references:
     version: 2
@@ -63,7 +63,7 @@ MonoBehaviour:
         type: 0
         outputConnections:
         - 13b1a789-be6c-47de-b0d6-1bd9daeadd3d
-        Position: {x: 280.00003, y: 201.6}
+        Position: {x: 119.60004, y: 223.20003}
         InputConnections: []
     - rid: 2229735494708887663
       type: {class: MCEndNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
@@ -88,11 +88,12 @@ MonoBehaviour:
         - cb0989bf-abd2-42f3-b538-c961d9f5279a
         mission:
           missionId: b0e01683-647c-4853-bf9e-ca6e4126a41e|ae8166b2-cb26-4487-ac55-7b7f9d66c085
-          missionName: 
+          missionName: "\u6D4B\u8BD5"
           missionDescription: 
           missionRequirementMode: 0
           customRequirementCompleteCount: -1
-          missionRequirements: []
+          missionRequirements:
+          - rid: 4036435877044158608
           missionRewards: []
     - rid: 2229735494708887665
       type: {class: MCEndNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
@@ -110,7 +111,7 @@ MonoBehaviour:
         type: 3
         outputConnections:
         - cb0989bf-abd2-42f3-b538-c961d9f5279a
-        Position: {x: 53.599976, y: 107.775986}
+        Position: {x: 23.200012, y: 107.19998}
         InputConnections: []
         mission:
           missionId: b0e01683-647c-4853-bf9e-ca6e4126a41e|30802f1d-43f2-4002-ab39-a2c039913bf1
@@ -120,3 +121,9 @@ MonoBehaviour:
           customRequirementCompleteCount: -1
           missionRequirements: []
           missionRewards: []
+    - rid: 4036435877044158608
+      type: {class: TestRequirement, ns: , asm: Assembly-CSharp}
+      data:
+        Conditions: []
+        testValue: 0
+        testbool: 0

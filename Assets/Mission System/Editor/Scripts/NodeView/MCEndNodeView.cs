@@ -11,6 +11,8 @@ namespace Tomoe.MissionSystem.Editor
         {
             CreatePort("input", Direction.Input);
             AddToClassList("end-node");
+
+            title = "【End】";
         }
     }
 }
