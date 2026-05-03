@@ -7,20 +7,21 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Action = Tomoe.MissionSystem.Runtime.Action;
 
 namespace Tomoe.MissionSystem.Editor
 {
-    public class ConditionDrawer : VisualElement
+    public class ActionDrawer : VisualElement
     {
         private (ListView listView, SerializedProperty property) tuple;
         
         /// <param name="property">这个字段是数组类型</param>
-        public ConditionDrawer(SerializedProperty property)
+        public ActionDrawer(SerializedProperty property)
         {
             Undo.undoRedoPerformed += UndoRedoPerformed;
             RegisterCallback<DetachFromPanelEvent>(evt => Undo.undoRedoPerformed -= UndoRedoPerformed);
             
-            SetupAndAddPolymorphicList(property.displayName, typeof(Condition), this, property);
+            SetupAndAddPolymorphicList(property.displayName, typeof(Action), this, property);
         }
         
         private void SetupListView(ListView listView, SerializedProperty property, DerivedFromTypeSearchTree provider)

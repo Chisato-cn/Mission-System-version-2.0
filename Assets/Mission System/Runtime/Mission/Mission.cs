@@ -17,30 +17,10 @@ namespace Tomoe.MissionSystem.Runtime
     {
         [SerializeField] private string missionId;
         [SerializeField, TextArea(1, 10)] private string missionName;
-
-#if UNITY_EDITOR
-        [MCNodeViewExtensionStyle(MCNodeViewExtensionStyleAttribute.StyleType.TitlePlusContent)]
-#endif
         [SerializeField, TextArea(5, 10)] private string missionDescription;
-
-#if UNITY_EDITOR
-        [MCNodeViewExtensionStyle(MCNodeViewExtensionStyleAttribute.StyleType.LabelPlusValue)]
-#endif
         [SerializeField] private MissionRequirementMode missionRequirementMode;
-        
-#if UNITY_EDITOR
-        [MCNodeViewExtensionStyle(MCNodeViewExtensionStyleAttribute.StyleType.LabelPlusValue)]
-#endif
         [SerializeField] private int customRequirementCompleteCount = -1;
-        
-#if UNITY_EDITOR
-        [MCNodeViewExtensionStyle(MCNodeViewExtensionStyleAttribute.StyleType.IconPlusContent)]
-#endif
         [SerializeReference] private MissionRequirement[] missionRequirements;
-        
-#if UNITY_EDITOR
-        [MCNodeViewExtensionStyle(MCNodeViewExtensionStyleAttribute.StyleType.IconPlusContent)]
-#endif     
         [SerializeReference] private MissionReward[] missionRewards;
         
         public string Id => missionId;

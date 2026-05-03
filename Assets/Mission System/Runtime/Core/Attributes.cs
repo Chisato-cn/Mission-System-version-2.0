@@ -35,22 +35,5 @@ namespace Tomoe.MissionSystem.Runtime
             DrawerType = drawerType;
         }
     }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public class MCNodeViewExtensionStyleAttribute : Attribute
-    {
-        public enum StyleType
-        {
-            TitlePlusContent,
-            LabelPlusValue,
-            IconPlusContent,
-        }
-        public StyleType Style { get; }
-        
-        public MCNodeViewExtensionStyleAttribute(StyleType style)
-        {
-            Style = style;
-        }
-    }
 #endif
 }

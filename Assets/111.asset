@@ -17,7 +17,7 @@ MonoBehaviour:
   - guid: 6be4f980-1622-4748-a37c-21ec1dfc1f7b
     inputMCNode: 264623e8-895b-47e8-9238-9821db09f186
     outputMCNode: 518e386b-935e-4fd4-8ccc-d34a4c474ca9
-    isValid: 0
+    isNotValid: 0
     isParallelConnection: 0
     hasCondition: 0
     conditions: []

@@ -1,7 +1,0 @@
-<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <Style src="project://database/Assets/Mission%20System/Editor/Resources/StyleSheet/ConditionDrawer.uss?fileID=7433441132597879392&amp;guid=05146053188ab4f4089ff1a9aaac8ee0&amp;type=3#ConditionDrawer"/>
-    <ui:VisualElement name="Conditions" class="container">
-        <ui:Label text="Label" style="-unity-text-align: middle-left;"/>
-        <ui:ListView virtualization-method="DynamicHeight" show-border="true" reorderable="true" show-foldout-header="true" show-add-remove-footer="true" reorder-mode="Animated"/>
-    </ui:VisualElement>
-</ui:UXML>

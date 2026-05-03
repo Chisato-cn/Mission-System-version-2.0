@@ -5,7 +5,7 @@
 .start-node #title-label {
     color: rgb(255, 255, 255);
     font-size: 16px;
-    -unity-font-style: bold-and-italic;
+    -unity-font-style: bold;
 }
 .start-node #contents {
     background-color: rgba(3, 203, 1, 0.5);
@@ -23,7 +23,7 @@
 .end-node #title-label {
     color: rgb(255, 255, 255);
     font-size: 16px;
-    -unity-font-style: bold-and-italic;
+    -unity-font-style: bold;
 }
 .end-node #contents {
     background-color: rgba(255, 5, 0, 0.5);
@@ -33,4 +33,22 @@
 }
 .end-node #node-border #contents #top #input .port {
     --port-color: rgb(255, 5, 0);
+}
+/*---------------------------------------------------------------------------------------------------Mission-Node-View*/
+.mission-node #title {
+    background-color: rgb(37, 117, 218);
+}
+.mission-node #title-label {
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-font-style: bold;
+}
+.mission-node #contents {
+    background-color: rgba(37, 117, 218, 0.5);
+}
+.mission-node #node-border #contents #top #output .port {
+    --port-color: rgb(37, 117, 218);
+}
+.mission-node #node-border #contents #top #input .port {
+    --port-color: rgb(37, 117, 218);
 }

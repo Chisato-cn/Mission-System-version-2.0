@@ -16,24 +16,27 @@ namespace Tomoe.MissionSystem.Editor
         
         public MissionDrawer(SerializedProperty property)
         {
-            VisualTreeAsset visualTree = Resources.Load<VisualTreeAsset>("VisualTree/MissionDrawer");
-            visualTree.CloneTree(this);
+            Foldout root = new Foldout();
+            root.text = property.displayName;
+            root.style.backgroundColor = new Color(0.2666667f, 0.2666667f, 0.2666667f, 1);
+            Add(root);
             
             Undo.undoRedoPerformed += UndoRedoPerformed;
             RegisterCallback<DetachFromPanelEvent>(evt => Undo.undoRedoPerformed -= UndoRedoPerformed);
             list = new List<(ListView, SerializedProperty)>();
             
-            var foldOut = this.Q<Foldout>("Container");
-            foldOut.text = property.displayName;
-            
-            // todo：修改成不写死的模式
-            BindingProperty(this.Q<VisualElement>("Name"), property.FindPropertyRelative("missionName"));
-            BindingProperty(this.Q<VisualElement>("Description"), property.FindPropertyRelative("missionDescription"));
-            BindingProperty(this.Q<VisualElement>("RequirementMode"), property.FindPropertyRelative("missionRequirementMode"));
-            BindingProperty(this.Q<VisualElement>("CustomRequirementCompleteCount"), property.FindPropertyRelative("customRequirementCompleteCount"));
-            
-            SetupAndAddPolymorphicList("Mission Requirement", typeof(MissionRequirement), "missionRequirements", "Requirements", property);
-            SetupAndAddPolymorphicList("Mission Reward", typeof(MissionReward), "missionRewards", "Rewards", property);
+            HashSet<string> ignorance = new HashSet<string>() { "missionId" };
+            var fields = typeof(Mission).GetFields(BindingFlags.Public | BindingFlags.Instance |  BindingFlags.NonPublic);
+
+            foreach (FieldInfo info in fields)
+            {
+                if (ignorance.Contains(info.Name)) continue;
+                
+                var prop = property.FindPropertyRelative(info.Name);
+                if (info.GetCustomAttribute<SerializeReference>() != null && prop.isArray)
+                    SetupAndAddPolymorphicList(prop.displayName, info.FieldType.GetElementType(), root, prop);
+                else BindingProperty(root, prop);
+            }
         }
         
         private void UndoRedoPerformed()
@@ -46,13 +49,12 @@ namespace Tomoe.MissionSystem.Editor
             }
         }
         
-        private void SetupAndAddPolymorphicList(string title, Type baseType, string propertyPath, string containerName, SerializedProperty rootProperty)
+        private void SetupAndAddPolymorphicList(string title, Type baseType, VisualElement root, SerializedProperty targetProperty)
         {
             var searchTree = ScriptableObject.CreateInstance<DerivedFromTypeSearchTree>();
             searchTree.Init(title, baseType);
             
-            var targetProperty = rootProperty.FindPropertyRelative(propertyPath);
-            var listView = BindingListView(this.Q<VisualElement>(containerName), targetProperty, searchTree);
+            var listView = BindingListView(root, targetProperty, searchTree);
             searchTree.OnEntrySelected += type => RequirementSearchTreeOnOnEntrySelected(type, targetProperty, listView);
             
             list.Add((listView, targetProperty));
@@ -83,25 +85,20 @@ namespace Tomoe.MissionSystem.Editor
 
         private void BindingProperty(VisualElement root, SerializedProperty property)
         {
-            var label = root.Q<Label>();
-            label.text = property.displayName;
-            
-            var propertyField = root.Q<PropertyField>();
-            propertyField.label = String.Empty;
-            propertyField.bindingPath = property.propertyPath;
-            propertyField.Bind(property.serializedObject);
+            var propertyField = new MissionChainInspectorItem(property, true);
+            propertyField.RemoveFromClassList("default");
+            propertyField.AddToClassList("internal");
+            root.Add(propertyField);
         }
 
         private ListView BindingListView(VisualElement root, SerializedProperty property, DerivedFromTypeSearchTree provider)
         {
-            var label = root.Q<Label>();
-            label.text = property.displayName;
+            var item = new MissionChainInspectorListView();
+            item.ListView.headerTitle = property.displayName;
+            root.Add(item);
             
-            var listview = root.Q<ListView>();
-            listview.headerTitle = property.displayName;
-            SetupListView(listview, property, provider);
-            
-            return listview;
+            SetupListView(item.ListView, property, provider);
+            return item.ListView;
         }
 
         private void SetupListView(ListView listView, SerializedProperty property, DerivedFromTypeSearchTree provider)
@@ -140,6 +137,7 @@ namespace Tomoe.MissionSystem.Editor
                     {
                         var propertyField = new PropertyField(prop);
                         propertyField.Bind(elementProperty.serializedObject);
+                        propertyField.RegisterCallback<FocusOutEvent>(evt => MissionChainEditor.Instance.UpdateGraphView());
                         propertyContainer.Add(propertyField);
                     }
                 }

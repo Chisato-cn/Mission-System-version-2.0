@@ -17,28 +17,28 @@ MonoBehaviour:
   - guid: 13b1a789-be6c-47de-b0d6-1bd9daeadd3d
     inputMCNode: 1120cca8-c7eb-4ba9-a26b-a894a275e72a
     outputMCNode: 20e17376-08a2-41bb-9dd9-cc3486488dca
-    isValid: 0
+    isNotValid: 0
     isParallelConnection: 0
     hasCondition: 0
     conditions: []
   - guid: 41d1e3e6-e63d-4071-b504-0c2c05b23257
     inputMCNode: 8c51209d-428a-44ec-9d5d-32cf60ee3664
     outputMCNode: ae8166b2-cb26-4487-ac55-7b7f9d66c085
-    isValid: 1
+    isNotValid: 0
     isParallelConnection: 0
     hasCondition: 0
     conditions: []
   - guid: e1b17868-45e3-426d-9618-fdb62ccd3aee
     inputMCNode: 1120cca8-c7eb-4ba9-a26b-a894a275e72a
     outputMCNode: ae8166b2-cb26-4487-ac55-7b7f9d66c085
-    isValid: 0
+    isNotValid: 0
     isParallelConnection: 0
     hasCondition: 0
     conditions: []
   - guid: cb0989bf-abd2-42f3-b538-c961d9f5279a
     inputMCNode: ae8166b2-cb26-4487-ac55-7b7f9d66c085
     outputMCNode: 30802f1d-43f2-4002-ab39-a2c039913bf1
-    isValid: 0
+    isNotValid: 0
     isParallelConnection: 0
     hasCondition: 0
     conditions: []
@@ -48,10 +48,11 @@ MonoBehaviour:
   - rid: 2229735494708887664
   - rid: 2229735494708887665
   - rid: 2229735497126903875
+  - rid: 4036435900769763708
   missionChainType: 0
   missionChainName: "\u6D4B\u8BD5"
   missionChainDescription: 
-  GraphPosition: {x: 102.4, y: 163.2, z: 0}
+  GraphPosition: {x: 223.2, y: 285.6, z: 0}
   GraphScale: {x: 1, y: 1, z: 1}
   references:
     version: 2
@@ -63,7 +64,7 @@ MonoBehaviour:
         type: 0
         outputConnections:
         - 13b1a789-be6c-47de-b0d6-1bd9daeadd3d
-        Position: {x: 119.60004, y: 223.20003}
+        Position: {x: -20.800049, y: 181.59998}
         InputConnections: []
     - rid: 2229735494708887663
       type: {class: MCEndNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
@@ -83,13 +84,13 @@ MonoBehaviour:
         outputConnections:
         - 41d1e3e6-e63d-4071-b504-0c2c05b23257
         - e1b17868-45e3-426d-9618-fdb62ccd3aee
-        Position: {x: 131.99994, y: -20.223999}
+        Position: {x: 81.599976, y: -52.00003}
         InputConnections:
         - cb0989bf-abd2-42f3-b538-c961d9f5279a
         mission:
           missionId: b0e01683-647c-4853-bf9e-ca6e4126a41e|ae8166b2-cb26-4487-ac55-7b7f9d66c085
-          missionName: "\u6D4B\u8BD5"
-          missionDescription: 
+          missionName: "\u5728\u6D4B\u8BD5"
+          missionDescription: "\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A\u554A."
           missionRequirementMode: 0
           customRequirementCompleteCount: -1
           missionRequirements:
@@ -111,7 +112,7 @@ MonoBehaviour:
         type: 3
         outputConnections:
         - cb0989bf-abd2-42f3-b538-c961d9f5279a
-        Position: {x: 23.200012, y: 107.19998}
+        Position: {x: -96.80005, y: -105.59999}
         InputConnections: []
         mission:
           missionId: b0e01683-647c-4853-bf9e-ca6e4126a41e|30802f1d-43f2-4002-ab39-a2c039913bf1
@@ -127,3 +128,13 @@ MonoBehaviour:
         Conditions: []
         testValue: 0
         testbool: 0
+    - rid: 4036435900769763708
+      type: {class: MCActionNode, ns: Tomoe.MissionSystem.Runtime, asm: Assembly-CSharp}
+      data:
+        guid: f2fe6df5-9b96-40d3-8eb8-2f3791749f51
+        type: 2
+        outputConnections: []
+        Position: {x: 100.79999, y: -142.40002}
+        InputConnections: []
+        title: 
+        actions: []

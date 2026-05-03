@@ -17,15 +17,17 @@ namespace Tomoe.MissionSystem.Editor
         {
             VisualTreeAsset visualTree = Resources.Load<VisualTreeAsset>("VisualTree/MissionChainInspectorItem");
             visualTree.CloneTree(this);
+            AddToClassList("default");
             
             propName = this.Q<Label>("PropertyName");
             propField = this.Q<PropertyField>();
             
             propName.text = serializedProperty.displayName;
             propField.label = String.Empty;
-            propField.Bind(serializedProperty.serializedObject);
             propField.bindingPath = serializedProperty.propertyPath;
+            propField.Bind(serializedProperty.serializedObject);
             propField.SetEnabled(enable);
+            propField.RegisterCallback<FocusOutEvent>(evt => MissionChainEditor.Instance.UpdateGraphView());
         }
     }
 }

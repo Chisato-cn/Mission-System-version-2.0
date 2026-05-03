@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Mission%20System/Editor/Resources/StyleSheet/MissionChainInspectorListView.uss?fileID=7433441132597879392&amp;guid=4ea5f91e75869004e925c681900c7529&amp;type=3#MissionChainInspectorListView"/>
+    <ui:VisualElement name="Container" style="flex-grow: 1;">
+        <ui:ListView virtualization-method="DynamicHeight" show-border="true" reorderable="true" show-foldout-header="true" show-add-remove-footer="true" reorder-mode="Animated"/>
+    </ui:VisualElement>
+</ui:UXML>

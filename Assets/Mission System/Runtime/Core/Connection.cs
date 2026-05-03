@@ -11,11 +11,11 @@ namespace Tomoe.MissionSystem.Runtime
         [SerializeField] private string inputMCNode;
         [SerializeField] private string outputMCNode;
         
-        [SerializeField] private bool isValid;
+        [SerializeField] private bool isNotValid;
         [SerializeField] private bool isParallelConnection;
         
         [SerializeField] private bool hasCondition;
-        [SerializeReference] private Condition[] conditions;
+        [SerializeReference, HideInInspector] private Condition[] conditions;
         
         public bool IsParallelConnection => isParallelConnection;
         
@@ -25,8 +25,8 @@ namespace Tomoe.MissionSystem.Runtime
         {
             get
             {
-                if (isValid) return false;
-                if (!hasCondition || conditions == null) return false;
+                if (isNotValid) return false;
+                if (!hasCondition || conditions == null) return true;
                 
                 return conditions.All(c => c.IsConditionMet);
             }

@@ -3,6 +3,7 @@ using Tomoe.MissionSystem.Runtime;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Action = System.Action;
 
 namespace Tomoe.MissionSystem.Editor
 {
@@ -10,7 +11,7 @@ namespace Tomoe.MissionSystem.Editor
     {
         public Connection Data { get; set; }
 
-        public event Action<GraphElement> OnEdgeSelected; 
+        public event Action<GraphElement> OnEdgeSelected;
 
         public override void OnSelected()
         {
@@ -22,6 +23,11 @@ namespace Tomoe.MissionSystem.Editor
         {
             base.OnUnselected();
             OnEdgeSelected?.Invoke(null);
+        }
+
+        public void UpdateView()
+        {
+            
         }
     }
     
@@ -112,5 +118,10 @@ namespace Tomoe.MissionSystem.Editor
 
         public override Port InstantiatePort(Orientation orientation, Direction direction, Port.Capacity capacity, Type type) 
             => Port.Create<ConnectionView>(orientation, direction, capacity, type);
+
+        public virtual void UpdateView()
+        {
+            
+        }
     }
 }
