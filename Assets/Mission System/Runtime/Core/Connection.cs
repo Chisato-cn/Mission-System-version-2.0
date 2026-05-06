@@ -15,6 +15,9 @@ namespace Tomoe.MissionSystem.Runtime
         [SerializeField] private bool isParallelConnection;
         
         [SerializeField] private bool hasCondition;
+#if UNITY_EDITOR
+        [CustomPropertyDrawerType("Tomoe.MissionSystem.Editor.SerializedReferenceListPropertyDrawer")]
+#endif
         [SerializeReference, HideInInspector] private Condition[] conditions;
         
         public bool IsParallelConnection => isParallelConnection;

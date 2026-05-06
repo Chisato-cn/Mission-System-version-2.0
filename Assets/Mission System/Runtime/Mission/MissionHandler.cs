@@ -11,7 +11,7 @@ namespace Tomoe.MissionSystem.Runtime
         
         public string Id => mission.Id;
 
-        public MissionHandler(Mission mission)
+        public void Init(Mission mission)
         {
             this.mission = mission;
             requirementHandlers = mission.Requirements.Select(requirement => requirement.CreateHandler()).ToList();
@@ -50,9 +50,11 @@ namespace Tomoe.MissionSystem.Runtime
                 if (!handler.SendMessage(message, out bool handlerHasStatusChanged))
                 {
                     hasStatusChanged |= handlerHasStatusChanged;
+                    Debug.Log(handler.GetType() + "未完成需求");
                     return false;  // 当前处理器未完成，保持它在队首
                 }
         
+                Debug.Log(handler.GetType() + "完成这个需求,推进");
                 hasStatusChanged = true;
                 requirementHandlers.RemoveAt(0);  // 当前处理器完成，出队
             }

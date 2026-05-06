@@ -14,7 +14,7 @@ namespace Tomoe.MissionSystem.Editor
             AddToClassList("internal");
             
             ListView = this.Q<ListView>();
-            ListView.RegisterCallback<FocusOutEvent>(evt => MissionChainEditor.Instance.UpdateGraphView());
+            ListView.RegisterCallback<FocusOutEvent>(evt => MissionChainEditor.Instance?.UpdateGraphView());
         }
     }
 }

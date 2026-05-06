@@ -7,6 +7,6 @@ namespace Tomoe.MissionSystem.Editor
     [CustomPropertyDrawer(typeof(Mission))]
     public class MissionPropertyDrawer : PropertyDrawer
     {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property) => new MissionDrawer(property);
+        public override VisualElement CreatePropertyGUI(SerializedProperty property) => new MissionDrawer(property, null);
     }
 }

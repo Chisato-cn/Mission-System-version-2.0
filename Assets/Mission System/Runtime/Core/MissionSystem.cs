@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Tomoe.MissionSystem.Runtime
 {
@@ -8,17 +10,26 @@ namespace Tomoe.MissionSystem.Runtime
         private Dictionary<string, MissionHandler> missionHandlers = new Dictionary<string, MissionHandler>();
         
         public event Action<MissionHandler> OnMissionStarted; 
-        public event Action<MissionHandler> OnMissionStatusChanged;
-        public event Action<MissionHandler> OnMissionCompleted;
-        public event Action<MissionHandler> OnMissionRemoved;
+        public event Action<MissionHandler, bool> OnMissionStatusChanged;
+        public event Action<List<MissionHandler>, bool> OnMissionsRemoved;
         
         public bool StartMission(Mission mission)
         {
-            if (mission == null || missionHandlers.ContainsKey(mission.Id)) return false;
+            if (mission is null || missionHandlers.ContainsKey(mission.Id)) return false;
             
-            var missionHandler = new MissionHandler(mission); // todo：可对象池优化
-            missionHandlers.Add(missionHandler.Id, missionHandler);
-            OnMissionStarted?.Invoke(missionHandler);
+            var handler = new MissionHandler();
+            handler.Init(mission);
+            missionHandlers.Add(mission.Id, handler);
+            
+            OnMissionStarted?.Invoke(handler);
+            Debug.Log(mission.Name);
+            return true;
+        }
+
+        public bool RemoveMission(string missionId)
+        {
+            if (!missionHandlers.Remove(missionId, out var mission)) return false;
+            OnMissionsRemoved?.Invoke(new List<MissionHandler>(){ mission }, false);
             return true;
         }
         
@@ -26,35 +37,29 @@ namespace Tomoe.MissionSystem.Runtime
         {
             if (missionHandlers.Count == 0) return;
 
-            var handlerToRemove = new Queue<MissionHandler>();
-            foreach (var missionHandler in missionHandlers.Values)
+            Queue<MissionHandler> messageQueue = new Queue<MissionHandler>();
+            foreach (var handler in missionHandlers.Values)
             {
-                // 任务没有完成
-                if (!missionHandler.SendMessage(message, out bool hasStatusChanged))
+                // false代表,任务没完成, hasStatusChanged代表任务需求的状态发生了变化（有可能是进入下一个需求，也有可能是需求的进度推进）
+                if (!handler.SendMessage(message, out bool hasStatusChanged))
                 {
-                    if (hasStatusChanged) OnMissionStatusChanged?.Invoke(missionHandler);
+                    if (hasStatusChanged) OnMissionStatusChanged?.Invoke(handler, false);
                     continue;
                 }
                 
-                OnMissionStatusChanged?.Invoke(missionHandler);
-                // 应用奖励，从任务字典中移出
-                missionHandler.ApplyRewards();
-                handlerToRemove.Enqueue(missionHandler);
+                // true代表，当前任务完成
+                OnMissionStatusChanged?.Invoke(handler, true);
+                handler.ApplyRewards();
+                messageQueue.Enqueue(handler);
             }
             
-            while (handlerToRemove.Count > 0)
+            var hashSet = messageQueue.ToList();
+            while (messageQueue.Count > 0)
             {
-                var handler = handlerToRemove.Dequeue();
+                var handler = messageQueue.Dequeue();
                 missionHandlers.Remove(handler.Id);
-                OnMissionCompleted?.Invoke(handler);
             }
-        }
-        
-        public bool RemoveMission(string missionId)
-        {
-            if (!missionHandlers.Remove(missionId, out var mission)) return false;
-            OnMissionRemoved?.Invoke(mission);
-            return true;
+            if (hashSet.Count > 0) OnMissionsRemoved?.Invoke(hashSet, true);
         }
     }
 }

@@ -26,7 +26,9 @@ namespace Tomoe.MissionSystem.Editor
             mission = ((MCMissionNode)node).Mission;
             missionRequirements = new List<MissionExtensionItemStyle_IconPlusContent>();
             missionRewards = new List<MissionExtensionItemStyle_IconPlusContent>();
-
+            
+            //todo:missionProperty
+            
             missionDescription = new MissionExtensionItemStyle_TitlePlusContent("Description", mission.Description);
             extensionContainer.Add(missionDescription);
             
@@ -38,19 +40,25 @@ namespace Tomoe.MissionSystem.Editor
                 missionCustomRequirement = new MissionExtensionItemStyle_LabelPlusValue("Custom Requirement Complete Amount: ", mission.CustomRequirementCompleteCount.ToString());
                 extensionContainer.Add(missionCustomRequirement);
             }
-            
-            foreach (MissionRequirement requirement in mission.Requirements)
-            { 
-                var item = new MissionExtensionItemStyle_IconPlusContent(Resources.Load<Texture2D>("Icon/cs Script Icon"), requirement.Description);
-                missionRequirements.Add(item);
-                extensionContainer.Add(item);
+
+            if (mission.Requirements != null)
+            {
+                foreach (MissionRequirement requirement in mission.Requirements)
+                { 
+                    var item = new MissionExtensionItemStyle_IconPlusContent(Resources.Load<Texture2D>("Icon/cs Script Icon"), requirement.Description);
+                    missionRequirements.Add(item);
+                    extensionContainer.Add(item);
+                }
             }
 
-            foreach (MissionReward reward in mission.Rewards)
+            if (mission.Rewards != null)
             {
-                var item = new MissionExtensionItemStyle_IconPlusContent(Resources.Load<Texture2D>(reward.IconPath), reward.ItemName, reward.ItemAmount.ToString());
-                missionRewards.Add(item);
-                extensionContainer.Add(item);
+                foreach (MissionReward reward in mission.Rewards)
+                {
+                    var item = new MissionExtensionItemStyle_IconPlusContent(Resources.Load<Texture2D>(reward.IconPath), reward.ItemName, reward.ItemAmount.ToString());
+                    missionRewards.Add(item);
+                    extensionContainer.Add(item);
+                }
             }
             
             title = $"【Mission】 {mission.Name}";
@@ -67,12 +75,24 @@ namespace Tomoe.MissionSystem.Editor
 
             for (int i = 0; i < missionRequirements.Count; i++)
             {
-                missionRequirements[i].UpdateView(Resources.Load<Texture2D>("Icon/cs Script Icon"), mission.Requirements[i].Description);
+                if (i < mission.Requirements.Count)
+                    missionRequirements[i].UpdateView(Resources.Load<Texture2D>("Icon/cs Script Icon"), mission.Requirements[i].Description);
+                else
+                {
+                    missionRequirements.RemoveAt(i);
+                    i--;
+                }
             }
             
             for (int i = 0; i < missionRewards.Count; i++)
             {
-                missionRewards[i].UpdateView(Resources.Load<Texture2D>(mission.Rewards[i].IconPath), mission.Rewards[i].ItemName, mission.Rewards[i].ItemAmount.ToString());
+                if (i < mission.Rewards.Count) 
+                    missionRewards[i].UpdateView(Resources.Load<Texture2D>(mission.Rewards[i].IconPath), mission.Rewards[i].ItemName, mission.Rewards[i].ItemAmount.ToString());
+                else
+                {
+                    missionRewards.RemoveAt(i);
+                    i--;
+                }
             }
             
             RefreshExpandedState();

@@ -7,6 +7,8 @@ namespace Tomoe.MissionSystem.Runtime
 {
     public enum MissionChainType
     {
+        Flow,        // 底层流程链
+        
         Trailblaze,     // 开拓任务
         Finale,         // 终末任务
         Companion,      // 同行任务
@@ -21,6 +23,11 @@ namespace Tomoe.MissionSystem.Runtime
         [SerializeField] private List<Connection> connections = new List<Connection>();
         [SerializeReference] private List<MCNode> nodes = new List<MCNode>();
         
+#if UNITY_EDITOR
+        public Vector3 GraphPosition = Vector3.zero;
+        public Vector3 GraphScale = Vector3.one;
+#endif
+        
         [SerializeField] private MissionChainType missionChainType;
         [SerializeField, TextArea(1, 10)] private string missionChainName;
         [SerializeField, TextArea(3, 10)] private string missionChainDescription;
@@ -34,12 +41,7 @@ namespace Tomoe.MissionSystem.Runtime
         public IReadOnlyDictionary<string, Connection> ReadOnlyConnectionsDict;
         public IReadOnlyList<Connection> ReadOnlyConnectionsList;
         public IReadOnlyList<MCNode> ReadOnlyNodesList;
-
-#if UNITY_EDITOR
-        public Vector3 GraphPosition = Vector3.zero;
-        public Vector3 GraphScale = Vector3.one;
-#endif
-
+        
         /// <summary>
         /// 通过CreateAssetMenu创建资产调用
         /// </summary>

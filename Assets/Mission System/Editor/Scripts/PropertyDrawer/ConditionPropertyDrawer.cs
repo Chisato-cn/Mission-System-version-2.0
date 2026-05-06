@@ -7,6 +7,6 @@ namespace Tomoe.MissionSystem.Editor
     [CustomPropertyDrawer(typeof(Condition))]
     public class ConditionPropertyDrawer : PropertyDrawer
     {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property) => new ConditionDrawer(property);
+        public override VisualElement CreatePropertyGUI(SerializedProperty property) => null;
     }
 }

@@ -52,3 +52,39 @@
 .mission-node #node-border #contents #top #input .port {
     --port-color: rgb(37, 117, 218);
 }
+/*---------------------------------------------------------------------------------------------------Action-Node-View*/
+.action-node #title {
+    background-color: rgb(255, 0, 255);
+}
+.action-node #title-label {
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-font-style: bold;
+}
+.action-node #contents {
+    background-color: rgba(255, 0, 255, 0.5);
+}
+.action-node #node-border #contents #top #output .port {
+    --port-color: rgb(255, 0, 255);
+}
+.action-node #node-border #contents #top #input .port {
+    --port-color: rgb(255, 0, 255);
+}
+/*-----------------------------------------------------------------------------------------Sub-Mission-Chain-Node-View*/
+.sub-mission-chain-node #title {
+    background-color: rgb(160, 160, 160);
+}
+.sub-mission-chain-node #title-label {
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    -unity-font-style: bold;
+}
+.sub-mission-chain-node #contents {
+    background-color: rgba(160, 160, 160, 0.5);
+}
+.sub-mission-chain-node #node-border #contents #top #output .port {
+    --port-color: rgb(160, 160, 160);
+}
+.sub-mission-chain-node #node-border #contents #top #input .port {
+    --port-color: rgb(160, 160, 160);
+}

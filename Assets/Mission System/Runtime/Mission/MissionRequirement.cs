@@ -6,13 +6,15 @@ namespace Tomoe.MissionSystem.Runtime
     [Serializable]
     public abstract class MissionRequirement
     {
+        [SerializeField] protected string description;        // todo：没有序列化出来
 #if UNITY_EDITOR
-        [CustomPropertyDrawerType("ConditionDrawer")]
+        [CustomPropertyDrawerType("Tomoe.MissionSystem.Editor.SerializedReferenceListPropertyDrawer")]
 #endif
-        [SerializeReference] protected Condition[] Conditions;
+        [SerializeReference] protected Condition[] conditions;
+        
         
         protected abstract Type handlerType { get; }
-        public abstract string Description { get; }
+        public string Description => description;
         
         public abstract bool CheckMessage(object message);
 

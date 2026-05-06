@@ -14,7 +14,7 @@ namespace Tomoe.MissionSystem.Editor
     {
         private List<(ListView listView, SerializedProperty property)> list;
         
-        public MissionDrawer(SerializedProperty property)
+        public MissionDrawer(SerializedProperty property, FieldInfo _)
         {
             Foldout root = new Foldout();
             root.text = property.displayName;
@@ -132,7 +132,9 @@ namespace Tomoe.MissionSystem.Editor
                     var attribute = info.GetCustomAttribute<CustomPropertyDrawerTypeAttribute>();
                     var prop = elementProperty.FindPropertyRelative(info.Name);
 
-                    if (attribute != null) propertyContainer.Add(GeneratePropertyField(attribute.DrawerType, prop));
+                    if (attribute != null && !string.IsNullOrEmpty(attribute.DrawerType))                         
+                        propertyContainer
+                        .Add((VisualElement)Activator.CreateInstance(Type.GetType(attribute.DrawerType), prop, info));
                     else
                     {
                         var propertyField = new PropertyField(prop);
@@ -196,26 +198,19 @@ namespace Tomoe.MissionSystem.Editor
     
         private void UpdateDataSource(BaseListView listView, SerializedProperty property)
         {
-            // 重新排序
-            var propertyList = new List<SerializedProperty>(property.arraySize);
-            for (int i = 0; i < property.arraySize; i++)
+            try
             {
-                propertyList.Add(property.GetArrayElementAtIndex(i));
+                // 重新排序
+                var propertyList = new List<SerializedProperty>(property.arraySize);
+                for (int i = 0; i < property.arraySize; i++)
+                {
+                    propertyList.Add(property.GetArrayElementAtIndex(i));
+                }
+
+                listView.itemsSource = propertyList;
+                listView.Rebuild();
             }
-
-            listView.itemsSource = propertyList;
-            listView.Rebuild();
-        }
-
-        private VisualElement GeneratePropertyField(string drawerType, SerializedProperty property)
-        {
-            switch (drawerType)
-            {
-                case "ConditionDrawer":
-                    return new ConditionDrawer(property);
-            }
-
-            return null;
+            catch (Exception e) { return; }
         }
     }
 }

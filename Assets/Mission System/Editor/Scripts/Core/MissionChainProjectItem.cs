@@ -32,7 +32,9 @@ namespace Tomoe.MissionSystem.Editor
             RegisterCallback<PointerDownEvent>(OnPointerDown);
             dropdownMenuHandler = new DropdownMenuHandler(menu =>
             {
-                menu.AppendAction("Delete Chain Asset", null);
+                menu.AppendAction("Delete Chain Asset", action => this.editor.DeleteChainAsset(missionChainGuid));
+                menu.AppendSeparator();
+                menu.AppendAction("Copy Chain Guid", action => GUIUtility.systemCopyBuffer = missionChainGuid);
             });
         }
 
@@ -40,7 +42,7 @@ namespace Tomoe.MissionSystem.Editor
         {
             if (evt.button == 0)
             {
-                if (editor.MissionChain.Guid == missionChainGuid) return;
+                if (editor.MissionChain?.Guid == missionChainGuid) return;
                 editor.OpenAssetBasedProjectItem(missionChainGuid);
             }
             else if (evt.button == 1)

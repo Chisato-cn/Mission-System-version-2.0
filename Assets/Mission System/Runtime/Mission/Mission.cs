@@ -18,8 +18,9 @@ namespace Tomoe.MissionSystem.Runtime
         [SerializeField] private string missionId;
         [SerializeField, TextArea(1, 10)] private string missionName;
         [SerializeField, TextArea(5, 10)] private string missionDescription;
+        [SerializeField] private MissionProperty missionProperty;
         [SerializeField] private MissionRequirementMode missionRequirementMode;
-        [SerializeField] private int customRequirementCompleteCount = -1;
+        [SerializeField] private int customRequirementCompleteCount = 1;
         [SerializeReference] private MissionRequirement[] missionRequirements;
         [SerializeReference] private MissionReward[] missionRewards;
         
@@ -27,6 +28,7 @@ namespace Tomoe.MissionSystem.Runtime
         public string Name => missionName;
         public string Description => missionDescription;
         public bool IsSingleRequirement => missionRequirements.Length == 1;
+        public MissionProperty Property => missionProperty;
         public MissionRequirementMode RequirementMode => missionRequirementMode;
         public int CustomRequirementCompleteCount => customRequirementCompleteCount;
         public IReadOnlyList<MissionRequirement> Requirements => missionRequirements;

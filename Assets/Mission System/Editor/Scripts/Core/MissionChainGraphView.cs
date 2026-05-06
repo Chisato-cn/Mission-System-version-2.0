@@ -113,6 +113,7 @@ namespace Tomoe.MissionSystem.Editor
         public void PopulateGraph()
         {
             DeleteElements(graphElements);
+            if (currentChain == null) return;
             
             if (currentChain.ReadOnlyNodesList.Count == 0)
             {
@@ -241,6 +242,10 @@ namespace Tomoe.MissionSystem.Editor
                     node.Node.OutputConnections.Clear();
                     node.Node.InputConnections.Clear();
                     currentChain.RemoveNode(node.Node);
+                    foreach (string connectionGuid in connectionToDelete)
+                    {
+                        currentChain.RemoveAllConnection(connection => connection.Guid == connectionGuid);
+                    }
                 }
                 editor.SerializedObject.Update();
                 

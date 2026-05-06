@@ -40,8 +40,10 @@ namespace Tomoe.MissionSystem.Editor
 
         private void SaveGraph()
         {
-            chain.GraphPosition = graphView.viewTransform.position;
-            chain.GraphScale = graphView.viewTransform.scale;
+            if (chain == null) return;
+            
+            chain.GraphPosition = graphView.contentViewContainer.resolvedStyle.translate;
+            chain.GraphScale = graphView.contentViewContainer.resolvedStyle.scale.value;
             EditorUtility.SetDirty(chain);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -64,7 +66,7 @@ namespace Tomoe.MissionSystem.Editor
         public GraphElement CurrentSelected { get; private set; }
         public MissionChain MissionChain => chain;
         public SerializedObject SerializedObject => serializedObject;
-        public bool IsChainChangedDueToClearGraph { get; set; }
+        public bool IsChainChangedDueToClearGraph { get; set; } = false;
         
         public void CreateGUI()
         {
@@ -152,6 +154,7 @@ namespace Tomoe.MissionSystem.Editor
         private void OnDisable()
         {
             SaveGraph();
+            Undo.ClearAll();
             windowFocusChanged -= SearchWindowOnwindowFocusChanged;
             foreach (var tuple in chains.Values)
             {
@@ -160,17 +163,49 @@ namespace Tomoe.MissionSystem.Editor
             chains.Clear();
         }
 
+        public void DeleteChainAsset(string chainGuid)
+        {
+            var chainTuple = chains[chainGuid];
+            chainTuple.serializedObject?.Dispose();
+            chains.Remove(chainGuid);
+            
+            AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(chainTuple.asset));
+            AssetDatabase.Refresh();
+
+            if (chain.Guid == chainGuid)
+            {
+                IsChainChangedDueToClearGraph = true;
+                PopulateWindow(null);
+            }
+            else PopulateProject();
+        }
+
+        public string GetMissionChainName(string chainId)
+        {
+            if (string.IsNullOrEmpty(chainId) || !chains.TryGetValue(chainId, out var tuple)) return String.Empty;
+            return tuple.asset.Name;
+        }
+
         private void PopulateWindow(MissionChain chain)
         {
             // 数据初始化
             this.chain = chain;
-            if (!chains.TryGetValue(chain.Guid, out var tuple))
+            serializedObject = null;
+            
+            if (chain != null)
             {
-                // 防止特殊情况：窗口已经打开，但是在unity中手动创建missionChain资产，然后双击打开，此时这个资产并未被缓存到字典中
-                serializedObject = new SerializedObject(chain);
-                chains[chain.Guid] = (chain, serializedObject);
+                if (!chains.TryGetValue(chain.Guid, out var tuple))
+                {
+                    // 防止特殊情况：窗口已经打开，但是在unity中手动创建missionChain资产，然后双击打开，此时这个资产并未被缓存到字典中
+                    serializedObject = new SerializedObject(chain);
+                    chains[chain.Guid] = (chain, serializedObject);
+                }
+                else
+                {
+                    serializedObject = tuple.serializedObject;
+                    serializedObject.Update();
+                }
             }
-            else serializedObject = tuple.serializedObject;
             
             graphView.PopulateGraph();
             PopulateInspector(null);
@@ -179,13 +214,20 @@ namespace Tomoe.MissionSystem.Editor
         
         public void PopulateInspector(GraphElement element)
         {
-            serializedObject.Update();
+            serializedObject?.Update();
             inspectorContainer.Clear();
+            if (chain == null) return;
 
+            var previous = CurrentSelected;
             CurrentSelected = element;
             if (element is ConnectionView connectionView) PopulateEdgePropertyView(connectionView); // 连接线
             else if (element is MissionChainNode node) PopulateNodePropertyView(node);              // 节点
-            else PopulateChainPropertyView();                                                       // 链
+            else
+            {
+                if (previous is MissionChainNode previousNodeView) previousNodeView.UpdateView();
+                else if (previous is ConnectionView previousConnectionView) previousConnectionView.UpdateView();
+                PopulateChainPropertyView(); // 链
+            }
         }
 
         private void PopulateEdgePropertyView(ConnectionView connectionView)
@@ -194,7 +236,7 @@ namespace Tomoe.MissionSystem.Editor
             var edges = serializedObject.FindProperty("connections");
             var prop = edges.GetArrayElementAtIndex(index);
 
-            HashSet<string> ignorance = new HashSet<string>(){ "m_Script", "inputMCNode", "outputMCNode", "conditions" };
+            HashSet<string> ignorance = new HashSet<string>(){ "m_Script", "inputMCNode", "outputMCNode" };
             HashSet<string> disable = new HashSet<string>() { "guid" };
             var fields = typeof(Connection)                // 通过反射获取派生类全部字段
                 .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -202,17 +244,19 @@ namespace Tomoe.MissionSystem.Editor
             foreach (FieldInfo info in fields)
             {
                 if (ignorance.Contains(info.Name)) continue;
-                
-                bool isEnable = !disable.Contains(info.Name);
+
                 var fieldProp = prop.FindPropertyRelative(info.Name);
-                var item = new MissionChainInspectorItem(fieldProp, isEnable);
-                
-                item.PropField.AddToClassList("seventy-percent-width-property-field");
-                inspectorContainer.Add(item);
+                var attribute = info.GetCustomAttribute<CustomPropertyDrawerTypeAttribute>();
+                if (attribute == null)
+                {
+                    bool isEnable = !disable.Contains(info.Name);
+                    var item = new MissionChainInspectorItem(fieldProp, isEnable);
+                    item.PropField.AddToClassList("seventy-percent-width-property-field");
+                    inspectorContainer.Add(item);
+                }
+                else ProcessCustomDrawerProperty(fieldProp, attribute.DrawerType, info);
+
             }
-            
-            var condition = new ConditionDrawer(prop.FindPropertyRelative("conditions"));
-            inspectorContainer.Add(condition);
         }
 
         private void PopulateNodePropertyView(MissionChainNode node)
@@ -222,7 +266,7 @@ namespace Tomoe.MissionSystem.Editor
             var nodes = serializedObject.FindProperty("nodes");
             var prop = nodes.GetArrayElementAtIndex(index);
                 
-            HashSet<string> ignorance = new HashSet<string>(){ "m_Script", "InputConnections", "outputConnections", "mission", "actions" };
+            HashSet<string> ignorance = new HashSet<string>(){ "m_Script", "InputConnections", "outputConnections" };
             HashSet<string> disable = new HashSet<string>(){ "type", "guid", "Position",  };
             var nodeInstance = (MCNode)prop.managedReferenceValue;
             var fields = nodeInstance.GetType()                 // 通过反射获取派生类全部字段
@@ -231,20 +275,20 @@ namespace Tomoe.MissionSystem.Editor
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 
             // 合并字段
-            var fieldNameToProperty = new Dictionary<string, SerializedProperty>();
+            var fieldNameToProperty = new Dictionary<string, (SerializedProperty property, FieldInfo info)>();
             foreach (var field in baseFields)
             {
                 if (ignorance.Contains(field.Name)) continue;
                 
                 var fieldProp = prop.FindPropertyRelative(field.Name);
-                if (fieldProp != null) fieldNameToProperty[field.Name] = fieldProp;
+                if (fieldProp != null) fieldNameToProperty[field.Name] = (fieldProp, field);
             }
             foreach (var field in fields) 
             {
                 if (ignorance.Contains(field.Name)) continue;
                 
                 var fieldProp = prop.FindPropertyRelative(field.Name); 
-                if (fieldProp != null) fieldNameToProperty[field.Name] = fieldProp;
+                if (fieldProp != null) fieldNameToProperty[field.Name] = (fieldProp, field);
             }
                 
             // 排序 基类字段在前，派生类字段在后
@@ -252,53 +296,34 @@ namespace Tomoe.MissionSystem.Editor
                 .OrderBy(p => 
                 {
                     // 判断字段属于基类还是派生类
-                    var fieldName = p.name;
+                    var fieldName = p.property.name;
                     var isBaseField = baseFields.Any(f => f.Name == fieldName && 
                                                           (fields.All(df => df.Name != fieldName) || 
                                                            fieldNameToProperty[fieldName] == p));
                     return isBaseField ? 0 : 1;
                 })
-                .ThenBy(p => p.name)
                 .ToList();
-                
-            foreach (SerializedProperty property in sortedProperties)
+            
+            foreach (var tuple in sortedProperties)
             {
-                bool isEnable = !disable.Contains(property.name);
-                var item = new MissionChainInspectorItem(property, isEnable);
-                item.PropField.AddToClassList("seventy-percent-width-property-field");
-                inspectorContainer.Add(item);
-            }
-
-            // 特殊字段序列化
-            switch (node.Node.Type)
-            {
-                case NodeType.Action:
-                    ProcessActionNodeProperty(prop);
-                    break;
-                case NodeType.Mission:
-                    ProcessMissionNodeProperty(prop);
-                    break;
+                var attribute = tuple.info.GetCustomAttribute<CustomPropertyDrawerTypeAttribute>();
+                if (attribute == null)
+                {
+                    bool isEnable = !disable.Contains(tuple.property.name);
+                    var item = new MissionChainInspectorItem(tuple.property, isEnable);
+                    item.PropField.AddToClassList("seventy-percent-width-property-field");
+                    inspectorContainer.Add(item);
+                }
+                else ProcessCustomDrawerProperty(tuple.property, attribute.DrawerType, tuple.info);
             }
         }
 
-        private void ProcessMissionNodeProperty(SerializedProperty property)
+        private void ProcessCustomDrawerProperty(SerializedProperty property, string drawerType, FieldInfo info)
         {
-            var missionProp = property.FindPropertyRelative("mission");
-            if (missionProp != null)
-            {
-                var item = new MissionDrawer(missionProp);
-                inspectorContainer.Add(item);
-            }
-        }
-
-        private void ProcessActionNodeProperty(SerializedProperty property)
-        {
-            var actionProp = property.FindPropertyRelative("actions");
-            if (actionProp != null)
-            {
-                var item = new ActionDrawer(actionProp);
-                inspectorContainer.Add(item);
-            }
+            if (string.IsNullOrEmpty(drawerType)) return;
+            
+            var item = (VisualElement)Activator.CreateInstance(Type.GetType(drawerType), property, info);
+            inspectorContainer.Add(item);
         }
 
         private void PopulateChainPropertyView()
@@ -325,15 +350,14 @@ namespace Tomoe.MissionSystem.Editor
                 foreach (var pair in chains)
                 {
                     var item = new MissionChainProjectItem(this, pair.Value.serializedObject);
-                    if (pair.Key == chain.Guid) 
+                    if (pair.Key == chain?.Guid) 
                         item.OnSelected();
                     else item.OnDeselected();
                     projectContainer.Add(item);
                 }
             }
-            else
+            else // 模糊查询用
             {
-                Debug.Log(missionChainName);
                 var parsedQuery = queryEngine.ParseQuery(missionChainName);
                 if (!parsedQuery.valid) return;
 
@@ -382,6 +406,8 @@ namespace Tomoe.MissionSystem.Editor
 
         public void OpenAssetBasedProjectItem(string missionChainGuid)
         {
+            if (string.IsNullOrEmpty(missionChainGuid)) return;
+            
             SaveGraph();
             IsChainChangedDueToClearGraph = true;
             // 防止跨资产撤回，清空撤销栈

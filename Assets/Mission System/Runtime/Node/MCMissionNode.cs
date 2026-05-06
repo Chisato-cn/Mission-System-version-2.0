@@ -6,6 +6,9 @@ namespace Tomoe.MissionSystem.Runtime
     [Serializable, MCNode("Mission")]
     public class MCMissionNode : MCNode
     {
+#if UNITY_EDITOR
+        [CustomPropertyDrawerType("Tomoe.MissionSystem.Editor.MissionDrawer")]
+#endif
         [SerializeField] private Mission mission;
 
         public Mission Mission => mission;
